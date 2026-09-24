@@ -173,7 +173,9 @@ class UyghurLinguisticPipeline:
                     if entry is None and m.pos != "Proper noun":
                         # spelling-near context candidates (with verify caveat);
                         # skipped for proper nouns, whose near matches are noise.
-                        near_entries.append(self.dictionary.lookup_near(m.lemma, m.form))
+                        near_entries.append(
+                            self.dictionary.lookup_near(m.lemma, m.form, pos_hint=m.pos)
+                        )
                     else:
                         near_entries.append([])
 

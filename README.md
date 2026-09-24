@@ -136,6 +136,59 @@ Through universal token handling, multiword splitting, surface fallbacks, and ad
 
 ---
 
+### 3. Multi-Gloss Token Handling & Structured Sense Presentation
+
+#### Problem & Diagnostic Setup
+Even when a lemma is found in the dictionary, entries frequently carry multiple meanings. Evaluating dictionary hits on the FLORES-200 development set (13,800 exact hits):
+- **49.0%** (6,760 tokens) rendered $>1$ definition in the prompt table (capped at 3 definitions).
+- **Format limitation**: Definitions were joined by flat semicolons (`def1; def2; def3`), obscuring sense boundaries (since definitions often contain internal semicolons), providing no sense hierarchy, and concealing domain specialization. This risked misleading the LLM with secondary or specialized senses on everyday words.
+
+#### Categorization & Verification
+To categorize the multi-gloss tokens reliably without string-splitting artifacts, each persisted gloss from `dev.results.jsonl` was reconstructed from the SQLite database and verified with 100% character-level parity (`stats/analyze_gloss_ambiguity.py`):
+1. **Cross-POS Homograph Collisions (~26.4% / 1,787 tokens)**: The dictionary query looked up by headword without POS constraints, merging unrelated homographs sharing the same spelling (e.g. pronoun `bu` *"this"* merged with noun `bu` *"department/ministry"*; pronoun `ular` *"they"* merged with zoology noun `ular` *"snowcock"*).
+2. **Closed-Class / Function Words (~26.0% / 1,758 tokens)**: Pronouns, postpositions, and light verbs (`bol-`, `u`, `bilen`, `üchün`, `qil-`) whose grammatical role is already clear from context, but which displayed multiple secondary dictionary senses.
+3. **Specialized / Encyclopedic Senses (~20%)**: Historical senses with domain tags (`[agriculture]`, `[physiology]`, `[military]`, etc.) or secondary homographs in Schwarz (e.g. `dölet` *"country"* vs. *"wealth/male name"*; `adet` *"habit/custom"* vs. *"menstruation"`).
+4. **Legitimate Multi-Gloss Content-Word (~28%)**: Open-class words with genuinely distinct everyday meanings (`ay` *"moon/month"*, `til` *"tongue/language"*, `qoral` *"tool/weapon"*, `ket-` *"to go/to cost"*).
+   
+(The four categories are not partitions, they overlap for some tokens)
+
+#### Design Decisions
+
+1. **POS-Guided Query Filtering (`pos_hint`)**:
+    - Mapped morphological tagger POS tags (`m.pos`) to Schwarz POS categories (`POS_HINT_MAP`).
+    - When multiple entries match a headword, the query filters to the entry matching the token's disambiguated POS. If no entry matches the hint, it gracefully falls back to all entries (preserving 100% coverage).
+    - Eliminates cross-POS homograph contamination at the source (`bu` $\rightarrow$ *"this"*; `ular` $\rightarrow$ *"they"*; `burun` as noun $\rightarrow$ *"nose"*, as postposition $\rightarrow$ *"ago"*).
+
+2. **Structured Sense Presentation**:
+    - Senses are cleanly numbered (`1.`, `2.`, `3.`) and separated by ` / ` instead of semicolons, keeping definition-internal semicolons intact.
+    - Single-sense words remain plain without numbering.
+    - Senses with explicit domain metadata in SQLite are prefixed with bracketed tags (e.g. `[astronomy]`, `[physiology]`, `[military]`, `[agriculture]`).
+
+3. **Domain Agnosticism (No Artificial Truncation)**:
+    - Rather than assuming the domain of the input sentence or discarding secondary senses, all valid senses within the correct POS are retained. The structured presentation lets the LLM make context-aware sense selections without distractor confusion.
+
+4. **Prompt Guidance Clarification**:
+    - Updated Rule 3 in `pipeline/prompt.py` to inform the downstream model that Sense 1 is typically the primary meaning, bracketed tags indicate specialized domains, and the sense best fitting the sentence context and syntactic role should be chosen.
+
+#### Examples (Before vs. After)
+
+| Token / Lemma | Previous Format (Flat Semicolons) | Structured Presentation |
+|---|---|---|
+| **ئادەت** (*adet*, Noun) | `adet (n.): Habit; custom; convention; Menstruation` | `adet (n.): 1. Habit; custom; convention / 2. [physiology] Menstruation` |
+| **قورال** (*qoral*, Noun) | `qoral (n.): Tool; Weapon` | `qoral (n.): 1. Tool / 2. [military] Weapon` |
+| **كۈن** (*kün*, Noun) | `kün (n.): Sun; Day; Life; existence` | `kün (n.): 1. [astronomy] Sun / 2. Day / 3. Life; existence` |
+| **ئۇلار** (*ular*, Pronoun) | `ular (pro.): They; those; Snow pheasant; snowcock (Tetraogallus)` | `ular (pro.): They; those` |
+| **بۇ** (*bu*, Determiner) | `bu (pro.): This; Department; ministry` | `bu (pro.): This` |
+| **يەر** (*yer*, Noun) | `yer (n.): /geo. n. Land; ground; Part; portion; Place; locality` | `yer (n.): 1. [agriculture] Land; ground / 2. Part; portion / 3. Place; locality` |
+| **ئۇنىۋېرسىتېت** (*uniwërsitët*, Noun) | `uniwërsitët (n.): University` | `uniwërsitët (n.): University` |
+
+#### Result
+
+1. Decrease of multi-gloss token by about 5%
+2. 17.1% of the words now carry explicit bracketed domain context
+
+---
+
 ## Component Status
 
 ### 1. Dependency Parser
@@ -666,3 +719,4 @@ Result File:
 | `build_dataset.py` | Creates the dataset used for finetuning models for the disambiguation task | [`build_dataset.py`](disambiguater/build_dataset.py)                                             |
 | `run_flores_dev.py` | End-to-end FLORES eval harness; persists per-token results + aggregate statistics | [`run_flores_dev.py`](run_flores_dev.py)                                                         |
 | `analyze_misses.py` | Categorizes dictionary misses from a results file (no re-run needed)        | [`stats/analyze_misses.py`](stats/analyze_misses.py)                                             |
+| `analyze_gloss_ambiguity.py` | Analyzes multi-gloss dictionary ambiguity and sense counts from FLORES dev results | [`stats/analyze_gloss_ambiguity.py`](stats/analyze_gloss_ambiguity.py) |

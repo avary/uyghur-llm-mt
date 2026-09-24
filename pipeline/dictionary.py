@@ -5,7 +5,7 @@ dictionary.py - Dictionary lookup module using Henry G. Schwarz Uyghur-English S
 import sqlite3
 import re
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 
 
 def _norm_uly(s: str) -> str:
@@ -88,29 +88,93 @@ def _lev_banded(a: str, b: str, k: int = 1) -> int:
 
 
 @dataclass
+class DictSense:
+    """Represents a single dictionary sense with definition and optional domain."""
+    definition: str
+    domain: Optional[str] = None
+
+
+@dataclass
 class DictEntry:
     """Represents a clean dictionary entry tailored for LLM prompt context."""
     headword_uey: str
     headword_uly: str
     pos: Optional[str]
     definitions: List[str] = field(default_factory=list)
+    senses: List[DictSense] = field(default_factory=list)
     domain: Optional[str] = None
 
     @property
     def short_gloss(self) -> str:
-        """Return a concise, clean single-line English gloss."""
+        """Return a concise, clean single-line English gloss with numbered senses and domain markers."""
         pos_str = f" ({self.pos})" if self.pos else ""
-        if not self.definitions:
+        if not self.senses and not self.definitions:
             return f"{self.headword_uly}{pos_str}"
-        
-        # Clean up definitions (remove trailing periods, duplicate semicolons)
-        cleaned_defs = []
-        for d in self.definitions[:3]:
-            cd = d.strip().rstrip('.')
-            if cd and cd not in cleaned_defs:
-                cleaned_defs.append(cd)
-        defs_str = "; ".join(cleaned_defs)
+
+        sense_list = self.senses if self.senses else [DictSense(definition=d) for d in self.definitions]
+
+        cleaned_senses: List[Tuple[Optional[str], str]] = []
+        seen_defs = set()
+        for s in sense_list[:3]:
+            cd = s.definition.strip().rstrip('.')
+            if cd and cd not in seen_defs:
+                seen_defs.add(cd)
+                cleaned_senses.append((s.domain, cd))
+
+        if not cleaned_senses:
+            return f"{self.headword_uly}{pos_str}"
+
+        if len(cleaned_senses) == 1:
+            dom, defn = cleaned_senses[0]
+            dom_str = f"[{dom}] " if dom else ""
+            return f"{self.headword_uly}{pos_str}: {dom_str}{defn}"
+
+        parts = []
+        for i, (dom, defn) in enumerate(cleaned_senses, 1):
+            dom_str = f"[{dom}] " if dom else ""
+            parts.append(f"{i}. {dom_str}{defn}")
+        defs_str = " / ".join(parts)
         return f"{self.headword_uly}{pos_str}: {defs_str}"
+
+
+# Map Apertium / pipeline POS tags to Schwarz dictionary POS abbreviations
+POS_HINT_MAP: Dict[str, set] = {
+    'noun': {'n.', 'm.', 'top.'},
+    'proper noun': {'n.', 'top.', 'ant.'},
+    'verb': {'v.', 'vt.', 'vi.', 'vt., vi.', 'vi., vt.'},
+    'standard verb': {'v.', 'vt.', 'vi.', 'vt., vi.', 'vi., vt.'},
+    'future verbal adjective': {'v.', 'vt.', 'vi.', 'vt., vi.', 'vi., vt.', 'adj.'},
+    'past gerund': {'v.', 'vt.', 'vi.', 'vt., vi.', 'vi., vt.'},
+    'aorist': {'v.', 'vt.', 'vi.', 'vt., vi.', 'vi., vt.'},
+    'copula': {'v.', 'vi.'},
+    'adjective': {'adj.'},
+    'comparative': {'adj.'},
+    'adverb': {'adv.'},
+    'conjunctive adverb': {'adv.', 'conj.'},
+    'pronoun': {'pro.'},
+    'determiner': {'pro.', 'adj.'},
+    'postposition': {'pp.'},
+    'co-ordinating conjunction': {'conj.'},
+    'sub-ordinating conjunction': {'conj.'},
+    'conjunction': {'conj.'},
+    'numeral': {'num.'},
+    'interjection': {'int.'},
+}
+
+
+def _clean_definition(defn: str) -> str:
+    """Strip OCR artifacts, markdown bold, and leftover leading/trailing POS/domain/slash fragments."""
+    d = re.sub(r"\*\*([^*]+)\*\*", r"\1", defn).strip()
+    d = re.sub(r"^[.\s\d/a-z, ]*(?:n\.|adj\.|vi?\.|vt?\.|adv\.|pp\.|pro\.|conj\.)\s*", "", d).strip()
+    d = re.sub(r"[\s./]+$", "", d).strip()
+    return d
+
+
+def _matches_pos(entry_pos: Optional[str], target_tags: set) -> bool:
+    if not entry_pos:
+        return False
+    entry_tags = {p.strip() for p in entry_pos.split(',')}
+    return bool(entry_tags & target_tags)
 
 
 class UyghurDictionary:
@@ -226,7 +290,7 @@ class UyghurDictionary:
         # 1. Search by Arabic script headword variants
         for v in variants:
             cur.execute("""
-                SELECT e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.definition
+                SELECT e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.sense_number, s.domain, s.definition
                 FROM entries e
                 LEFT JOIN senses s ON e.id = s.entry_id
                 WHERE e.headword_uey = ?
@@ -234,7 +298,7 @@ class UyghurDictionary:
             """, (v,))
             rows = cur.fetchall()
             if rows:
-                entry = self._build_dict_entry(rows)
+                entry = self._build_dict_entry(rows, pos_hint=pos_hint)
                 self._cache[cache_key] = entry
                 return entry
 
@@ -243,7 +307,7 @@ class UyghurDictionary:
         uly_variants = [uly_stem, uly_stem + '-', uly_stem.rstrip('-')]
         for uv in uly_variants:
             cur.execute("""
-                SELECT e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.definition
+                SELECT e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.sense_number, s.domain, s.definition
                 FROM entries e
                 LEFT JOIN senses s ON e.id = s.entry_id
                 WHERE e.headword_uly = ?
@@ -251,7 +315,7 @@ class UyghurDictionary:
             """, (uv,))
             rows = cur.fetchall()
             if rows:
-                entry = self._build_dict_entry(rows)
+                entry = self._build_dict_entry(rows, pos_hint=pos_hint)
                 self._cache[cache_key] = entry
                 return entry
 
@@ -260,7 +324,7 @@ class UyghurDictionary:
         if surface and surface.strip() and surface.strip() != clean_stem:
             for v in self.generate_stem_variants(surface.strip(), is_verb):
                 cur.execute("""
-                    SELECT e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.definition
+                    SELECT e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.sense_number, s.domain, s.definition
                     FROM entries e
                     LEFT JOIN senses s ON e.id = s.entry_id
                     WHERE e.headword_uey = ?
@@ -268,7 +332,7 @@ class UyghurDictionary:
                 """, (v,))
                 rows = cur.fetchall()
                 if rows:
-                    entry = self._build_dict_entry(rows)
+                    entry = self._build_dict_entry(rows, pos_hint=pos_hint)
                     self._cache[cache_key] = entry
                     return entry
 
@@ -292,7 +356,8 @@ class UyghurDictionary:
         self,
         stem: str,
         surface: Optional[str] = None,
-        limit: int = 3
+        limit: int = 3,
+        pos_hint: Optional[str] = None
     ) -> List[DictEntry]:
         """
         Spelling-near candidates for a stem that has no exact dictionary entry.
@@ -305,7 +370,7 @@ class UyghurDictionary:
         stem = (stem or "").strip()
         if not stem or " " in stem:
             return []
-        cache_key = f"{stem}|{surface or ''}"
+        cache_key = f"{stem}|{surface or ''}|{pos_hint or ''}"
         if cache_key in self._near_cache:
             return self._near_cache[cache_key]
         index = self._near_index()   # builds _hw_index and _hw_norm lazily
@@ -328,37 +393,57 @@ class UyghurDictionary:
         entries = []
         for hw, _d in ranked:
             rows = self.conn.execute("""
-                SELECT e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.definition
+                SELECT e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.sense_number, s.domain, s.definition
                 FROM entries e
                 LEFT JOIN senses s ON e.id = s.entry_id
                 WHERE e.headword_uey = ?
                 ORDER BY e.id, s.sense_number
             """, (hw,)).fetchall()
             if rows:
-                entries.append(self._build_dict_entry(rows))
+                entries.append(self._build_dict_entry(rows, pos_hint=pos_hint))
         self._near_cache[cache_key] = entries
         return entries
 
-    def _build_dict_entry(self, rows: List[Tuple]) -> DictEntry:
-        """Assemble rows from SQLite into a structured DictEntry."""
-        headword_uey = rows[0][1]
-        headword_uly = rows[0][2]
-        pos = rows[0][3]
-        domain = rows[0][4]
+    def _build_dict_entry(
+        self,
+        rows: List[Tuple],
+        pos_hint: Optional[str] = None
+    ) -> DictEntry:
+        """Assemble rows from SQLite into a structured DictEntry with POS filtering and domain metadata."""
+        target_rows = rows
+        if pos_hint:
+            target_tags = POS_HINT_MAP.get(pos_hint.lower(), set())
+            if target_tags:
+                matching_rows = [r for r in rows if _matches_pos(r[3], target_tags)]
+                if matching_rows:
+                    target_rows = matching_rows
 
-        definitions = []
-        for r in rows:
-            defn = r[5]
-            if defn and defn.strip() and defn not in definitions:
-                # Remove Markdown bold asterisks from legacy OCR formatting
-                clean_defn = re.sub(r"\*\*([^*]+)\*\*", r"\1", defn).strip()
-                definitions.append(clean_defn)
+        headword_uey = target_rows[0][1]
+        headword_uly = target_rows[0][2]
+        pos = target_rows[0][3]
+        domain = target_rows[0][4]
+
+        definitions: List[str] = []
+        senses: List[DictSense] = []
+        seen_defs = set()
+
+        for r in target_rows:
+            # Row: (e.id, e.headword_uey, e.headword_uly, e.pos, e.domain, s.sense_number, s.domain, s.definition)
+            sense_domain = r[6]
+            defn = r[7]
+            if defn and defn.strip():
+                clean_defn = _clean_definition(defn)
+                if clean_defn and clean_defn not in seen_defs:
+                    seen_defs.add(clean_defn)
+                    definitions.append(clean_defn)
+                    senses.append(DictSense(definition=clean_defn, domain=sense_domain))
 
         return DictEntry(
             headword_uey=headword_uey,
             headword_uly=headword_uly,
             pos=pos,
             definitions=definitions,
+            senses=senses,
             domain=domain
         )
 

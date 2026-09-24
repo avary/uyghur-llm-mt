@@ -212,7 +212,7 @@ class PromptBuilder:
         guidance = "\n".join([
             "1. Preserve all grammatical inflections (tense, mood, voice, polarity, person/number agreements).",
             "2. Resolve pro-drop (omitted subjects) using verbal agreement suffixes where applicable.",
-            "3. Use the word-level dictionary definitions in proper contextual syntax.",
+            "3. Dictionary Translations: When multiple senses exist, they are numbered (1., 2., 3.) and separated by ' / '. Sense 1 is typically the primary or most common meaning. Bracketed labels such as [military], [physiology], or [agriculture] specify specialized domain usage. Choose the sense that best fits the sentence context, syntactic role, and domain.",
             "4. Provide only the final fluent English translation without conversational preamble.",
         ])
         if near_advice:
