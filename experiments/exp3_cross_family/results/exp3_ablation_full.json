@@ -1,0 +1,220 @@
+{
+  "scores": {
+    "Ministral-3-8B|c0_baseline": {
+      "chrfpp": 16.7,
+      "comet": 0.4904
+    },
+    "Ministral-3-8B|c1_syntax": {
+      "chrfpp": 28.22,
+      "comet": 0.6585
+    },
+    "Ministral-3-8B|c2_morph": {
+      "chrfpp": 25.56,
+      "comet": 0.6339
+    },
+    "Ministral-3-8B|c3_dict": {
+      "chrfpp": 27.74,
+      "comet": 0.6593
+    },
+    "Ministral-3-8B|c4_syntax_morph": {
+      "chrfpp": 24.09,
+      "comet": 0.6179
+    },
+    "Ministral-3-8B|c5_syntax_dict": {
+      "chrfpp": 28.13,
+      "comet": 0.6696
+    },
+    "Ministral-3-8B|c6_morph_dict": {
+      "chrfpp": 25.56,
+      "comet": 0.6508
+    },
+    "Ministral-3-8B|c7_full": {
+      "chrfpp": 25.65,
+      "comet": 0.6471
+    },
+    "Gemma-4-E2B|c0_baseline": {
+      "chrfpp": 16.48,
+      "comet": 0.4935
+    },
+    "Gemma-4-E2B|c1_syntax": {
+      "chrfpp": 34.27,
+      "comet": 0.7124
+    },
+    "Gemma-4-E2B|c2_morph": {
+      "chrfpp": 34.39,
+      "comet": 0.7159
+    },
+    "Gemma-4-E2B|c3_dict": {
+      "chrfpp": 35.84,
+      "comet": 0.7341
+    },
+    "Gemma-4-E2B|c4_syntax_morph": {
+      "chrfpp": 33.86,
+      "comet": 0.7079
+    },
+    "Gemma-4-E2B|c5_syntax_dict": {
+      "chrfpp": 35.58,
+      "comet": 0.7317
+    },
+    "Gemma-4-E2B|c6_morph_dict": {
+      "chrfpp": 35.94,
+      "comet": 0.7402
+    },
+    "Gemma-4-E2B|c7_full": {
+      "chrfpp": 35.42,
+      "comet": 0.7312
+    }
+  },
+  "deltas_vs_c0": {
+    "Ministral-3-8B|c1_syntax": {
+      "delta": 11.52,
+      "ci_lo": 11.03,
+      "ci_hi": 12.0,
+      "p": 0.0
+    },
+    "Ministral-3-8B|c2_morph": {
+      "delta": 8.86,
+      "ci_lo": 8.23,
+      "ci_hi": 9.53,
+      "p": 0.0
+    },
+    "Ministral-3-8B|c3_dict": {
+      "delta": 11.04,
+      "ci_lo": 10.42,
+      "ci_hi": 11.7,
+      "p": 0.0
+    },
+    "Ministral-3-8B|c4_syntax_morph": {
+      "delta": 7.39,
+      "ci_lo": 6.78,
+      "ci_hi": 8.06,
+      "p": 0.0
+    },
+    "Ministral-3-8B|c5_syntax_dict": {
+      "delta": 11.44,
+      "ci_lo": 10.79,
+      "ci_hi": 12.11,
+      "p": 0.0
+    },
+    "Ministral-3-8B|c6_morph_dict": {
+      "delta": 8.86,
+      "ci_lo": 8.18,
+      "ci_hi": 9.62,
+      "p": 0.0
+    },
+    "Ministral-3-8B|c7_full": {
+      "delta": 8.96,
+      "ci_lo": 8.26,
+      "ci_hi": 9.65,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|c1_syntax": {
+      "delta": 17.79,
+      "ci_lo": 17.33,
+      "ci_hi": 18.27,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|c2_morph": {
+      "delta": 17.91,
+      "ci_lo": 17.4,
+      "ci_hi": 18.43,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|c3_dict": {
+      "delta": 19.36,
+      "ci_lo": 18.86,
+      "ci_hi": 19.87,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|c4_syntax_morph": {
+      "delta": 17.37,
+      "ci_lo": 16.89,
+      "ci_hi": 17.87,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|c5_syntax_dict": {
+      "delta": 19.09,
+      "ci_lo": 18.59,
+      "ci_hi": 19.63,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|c6_morph_dict": {
+      "delta": 19.46,
+      "ci_lo": 18.94,
+      "ci_hi": 19.98,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|c7_full": {
+      "delta": 18.94,
+      "ci_lo": 18.46,
+      "ci_hi": 19.45,
+      "p": 0.0
+    }
+  },
+  "behavior": {
+    "Ministral-3-8B|c0_baseline": {
+      "len_capped": 47,
+      "avg_out_tok": 319
+    },
+    "Ministral-3-8B|c1_syntax": {
+      "len_capped": 2,
+      "avg_out_tok": 60
+    },
+    "Ministral-3-8B|c2_morph": {
+      "len_capped": 23,
+      "avg_out_tok": 104
+    },
+    "Ministral-3-8B|c3_dict": {
+      "len_capped": 24,
+      "avg_out_tok": 93
+    },
+    "Ministral-3-8B|c4_syntax_morph": {
+      "len_capped": 39,
+      "avg_out_tok": 133
+    },
+    "Ministral-3-8B|c5_syntax_dict": {
+      "len_capped": 16,
+      "avg_out_tok": 94
+    },
+    "Ministral-3-8B|c6_morph_dict": {
+      "len_capped": 74,
+      "avg_out_tok": 140
+    },
+    "Ministral-3-8B|c7_full": {
+      "len_capped": 37,
+      "avg_out_tok": 135
+    },
+    "Gemma-4-E2B|c0_baseline": {
+      "len_capped": 75,
+      "avg_out_tok": 376
+    },
+    "Gemma-4-E2B|c1_syntax": {
+      "len_capped": 0,
+      "avg_out_tok": 28
+    },
+    "Gemma-4-E2B|c2_morph": {
+      "len_capped": 1,
+      "avg_out_tok": 29
+    },
+    "Gemma-4-E2B|c3_dict": {
+      "len_capped": 0,
+      "avg_out_tok": 29
+    },
+    "Gemma-4-E2B|c4_syntax_morph": {
+      "len_capped": 0,
+      "avg_out_tok": 29
+    },
+    "Gemma-4-E2B|c5_syntax_dict": {
+      "len_capped": 0,
+      "avg_out_tok": 28
+    },
+    "Gemma-4-E2B|c6_morph_dict": {
+      "len_capped": 0,
+      "avg_out_tok": 29
+    },
+    "Gemma-4-E2B|c7_full": {
+      "len_capped": 0,
+      "avg_out_tok": 28
+    }
+  }
+}

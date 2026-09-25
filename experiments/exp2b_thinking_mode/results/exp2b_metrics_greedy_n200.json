@@ -1,0 +1,63 @@
+{
+  "runs": [
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2b_thinking_mode/results/qwen3.5-9b_c0_baseline_think-greedy_n200.results.jsonl",
+      "label": "Qwen3.5-9B C0 think-greedy",
+      "n": 200,
+      "n_failed": 47,
+      "chrfpp": 41.28,
+      "comet": 0.7439
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2b_thinking_mode/results/qwen3.5-9b_c7_full_think-greedy_n200.results.jsonl",
+      "label": "Qwen3.5-9B C7 think-greedy",
+      "n": 200,
+      "n_failed": 126,
+      "chrfpp": 21.24,
+      "comet": 0.5428
+    }
+  ],
+  "thinking_stats": {
+    "qwen3.5-9b_c0_baseline_think-greedy_n200.results.jsonl": {
+      "n": 200,
+      "answered_rate": 0.765,
+      "length_capped": 47,
+      "looping_reasoning": 137,
+      "looping_answer": 0,
+      "reasoning_chars_mean": 27772,
+      "reasoning_chars_p95": 56530,
+      "reasoning_chars_max": 65957
+    },
+    "qwen3.5-9b_c7_full_think-greedy_n200.results.jsonl": {
+      "n": 200,
+      "answered_rate": 0.37,
+      "length_capped": 126,
+      "looping_reasoning": 198,
+      "looping_answer": 0,
+      "reasoning_chars_mean": 38510,
+      "reasoning_chars_p95": 58100,
+      "reasoning_chars_max": 70820
+    }
+  },
+  "sampling": "greedy",
+  "deltas_vs_thinking_off": [
+    {
+      "label": "Qwen3.5-9B C0",
+      "think_chrfpp": 41.28,
+      "nothink_chrfpp": 47.65,
+      "delta_chrfpp": -6.37,
+      "think_comet": 0.7439,
+      "nothink_comet": 0.8543,
+      "delta_comet": -0.1104
+    },
+    {
+      "label": "Qwen3.5-9B C7",
+      "think_chrfpp": 21.24,
+      "nothink_chrfpp": 47.71,
+      "delta_chrfpp": -26.47,
+      "think_comet": 0.5428,
+      "nothink_comet": 0.8513,
+      "delta_comet": -0.3085
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "runs": [
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2b_thinking_mode/results/qwen3.5-9b_c0_baseline_think-recommended.results.jsonl",
+      "label": "Qwen3.5-9B C0 think-recommended",
+      "n": 997,
+      "n_failed": 116,
+      "chrfpp": 44.78,
+      "comet": 0.8052
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2b_thinking_mode/results/qwen3.5-9b_c7_full_think-recommended.results.jsonl",
+      "label": "Qwen3.5-9B C7 think-recommended",
+      "n": 997,
+      "n_failed": 131,
+      "chrfpp": 44.09,
+      "comet": 0.7914
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2b_thinking_mode/results/qwen3.5-4b_c0_baseline_think-recommended.results.jsonl",
+      "label": "Qwen3.5-4B C0 think-recommended",
+      "n": 997,
+      "n_failed": 79,
+      "chrfpp": 44.33,
+      "comet": 0.8078
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2b_thinking_mode/results/qwen3.5-4b_c7_full_think-recommended.results.jsonl",
+      "label": "Qwen3.5-4B C7 think-recommended",
+      "n": 997,
+      "n_failed": 467,
+      "chrfpp": 28.46,
+      "comet": 0.6171
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2b_thinking_mode/results/qwen3.5-27b_c0_baseline_think-recommended.results.jsonl",
+      "label": "Qwen3.5-27B C0 think-recommended",
+      "n": 997,
+      "n_failed": 11,
+      "chrfpp": 52.84,
+      "comet": 0.8711
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2b_thinking_mode/results/qwen3.5-27b_c7_full_think-recommended.results.jsonl",
+      "label": "Qwen3.5-27B C7 think-recommended",
+      "n": 997,
+      "n_failed": 5,
+      "chrfpp": 51.56,
+      "comet": 0.867
+    }
+  ],
+  "thinking_stats": {
+    "qwen3.5-9b_c0_baseline_think-recommended.results.jsonl": {
+      "n": 997,
+      "answered_rate": 0.8837,
+      "length_capped": 116,
+      "looping_reasoning": 651,
+      "looping_answer": 1,
+      "reasoning_chars_mean": 23953,
+      "reasoning_chars_p95": 50162,
+      "reasoning_chars_max": 65950
+    },
+    "qwen3.5-9b_c7_full_think-recommended.results.jsonl": {
+      "n": 997,
+      "answered_rate": 0.8686,
+      "length_capped": 131,
+      "looping_reasoning": 904,
+      "looping_answer": 0,
+      "reasoning_chars_mean": 25499,
+      "reasoning_chars_p95": 49105,
+      "reasoning_chars_max": 66251
+    },
+    "qwen3.5-4b_c0_baseline_think-recommended.results.jsonl": {
+      "n": 997,
+      "answered_rate": 0.9208,
+      "length_capped": 79,
+      "looping_reasoning": 432,
+      "looping_answer": 0,
+      "reasoning_chars_mean": 24323,
+      "reasoning_chars_p95": 47041,
+      "reasoning_chars_max": 63270
+    },
+    "qwen3.5-4b_c7_full_think-recommended.results.jsonl": {
+      "n": 997,
+      "answered_rate": 0.5316,
+      "length_capped": 467,
+      "looping_reasoning": 929,
+      "looping_answer": 0,
+      "reasoning_chars_mean": 34661,
+      "reasoning_chars_p95": 56657,
+      "reasoning_chars_max": 74124
+    },
+    "qwen3.5-27b_c0_baseline_think-recommended.results.jsonl": {
+      "n": 997,
+      "answered_rate": 0.989,
+      "length_capped": 11,
+      "looping_reasoning": 688,
+      "looping_answer": 0,
+      "reasoning_chars_mean": 18284,
+      "reasoning_chars_p95": 27966,
+      "reasoning_chars_max": 60992
+    },
+    "qwen3.5-27b_c7_full_think-recommended.results.jsonl": {
+      "n": 997,
+      "answered_rate": 0.995,
+      "length_capped": 5,
+      "looping_reasoning": 783,
+      "looping_answer": 0,
+      "reasoning_chars_mean": 19058,
+      "reasoning_chars_p95": 27509,
+      "reasoning_chars_max": 52952
+    }
+  },
+  "sampling": "recommended",
+  "deltas_vs_thinking_off": [
+    {
+      "label": "Qwen3.5-9B C0",
+      "think_chrfpp": 44.78,
+      "nothink_chrfpp": 47.65,
+      "delta_chrfpp": -2.87,
+      "think_comet": 0.8052,
+      "nothink_comet": 0.8543,
+      "delta_comet": -0.0491
+    },
+    {
+      "label": "Qwen3.5-9B C7",
+      "think_chrfpp": 44.09,
+      "nothink_chrfpp": 47.71,
+      "delta_chrfpp": -3.62,
+      "think_comet": 0.7914,
+      "nothink_comet": 0.8513,
+      "delta_comet": -0.0599
+    },
+    {
+      "label": "Qwen3.5-4B C0",
+      "think_chrfpp": 44.33,
+      "nothink_chrfpp": 44.58,
+      "delta_chrfpp": -0.25,
+      "think_comet": 0.8078,
+      "nothink_comet": 0.8355,
+      "delta_comet": -0.0277
+    },
+    {
+      "label": "Qwen3.5-4B C7",
+      "think_chrfpp": 28.46,
+      "nothink_chrfpp": 45.48,
+      "delta_chrfpp": -17.02,
+      "think_comet": 0.6171,
+      "nothink_comet": 0.8382,
+      "delta_comet": -0.2211
+    },
+    {
+      "label": "Qwen3.5-27B C0",
+      "think_chrfpp": 52.84,
+      "nothink_chrfpp": 51.03,
+      "delta_chrfpp": 1.81,
+      "think_comet": 0.8711,
+      "nothink_comet": 0.8723,
+      "delta_comet": -0.0012
+    },
+    {
+      "label": "Qwen3.5-27B C7",
+      "think_chrfpp": 51.56,
+      "nothink_chrfpp": 51.95,
+      "delta_chrfpp": -0.39,
+      "think_comet": 0.867,
+      "nothink_comet": 0.8706,
+      "delta_comet": -0.0036
+    }
+  ]
+}

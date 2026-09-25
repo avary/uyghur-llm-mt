@@ -1,0 +1,60 @@
+{
+  "runs": [
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp1_component_ablation/results/c0_baseline_qwen3.5-9b.results.jsonl",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 47.63,
+      "comet": 0.8544
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp1_component_ablation/results/c1_syntax_qwen3.5-9b.results.jsonl",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 48.05,
+      "comet": 0.8537
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp1_component_ablation/results/c2_morph_qwen3.5-9b.results.jsonl",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 48.18,
+      "comet": 0.8535
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp1_component_ablation/results/c3_dict_qwen3.5-9b.results.jsonl",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 48.34,
+      "comet": 0.8568
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp1_component_ablation/results/c4_syntax_morph_qwen3.5-9b.results.jsonl",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 47.82,
+      "comet": 0.8517
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp1_component_ablation/results/c5_syntax_dict_qwen3.5-9b.results.jsonl",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 47.86,
+      "comet": 0.8529
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp1_component_ablation/results/c6_morph_dict_qwen3.5-9b.results.jsonl",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 47.94,
+      "comet": 0.8536
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp1_component_ablation/results/c7_full_qwen3.5-9b.results.jsonl",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 47.71,
+      "comet": 0.8513
+    }
+  ]
+}

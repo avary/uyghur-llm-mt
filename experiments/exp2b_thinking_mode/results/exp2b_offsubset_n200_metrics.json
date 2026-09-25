@@ -1,0 +1,20 @@
+{
+  "runs": [
+    {
+      "path": "experiments/exp2b_thinking_mode/results/qwen3.5-9b_c0_baseline_offsubset_n200.results.jsonl",
+      "label": "9B C0 OFF (n200)",
+      "n": 200,
+      "n_failed": 0,
+      "chrfpp": 46.69,
+      "comet": 0.8488
+    },
+    {
+      "path": "experiments/exp2b_thinking_mode/results/qwen3.5-9b_c7_full_offsubset_n200.results.jsonl",
+      "label": "9B C7 OFF (n200)",
+      "n": 200,
+      "n_failed": 0,
+      "chrfpp": 45.45,
+      "comet": 0.8422
+    }
+  ]
+}

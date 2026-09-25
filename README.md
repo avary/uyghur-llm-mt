@@ -189,6 +189,108 @@ To categorize the multi-gloss tokens reliably without string-splitting artifacts
 
 ---
 
+### 4. End-to-End MT Evaluation — Component Ablation (Experiment 1)
+
+#### Question
+With all three components (syntax, morphology, dictionary) assembled, which one actually improves translation? And do they help *more* together than alone? To answer this we ran a full $2^3$ factorial ablation: every combination of components on/off, including the empty combination (zero-shot baseline).
+
+#### Setup
+- **Data**: FLORES-200 dev, 997 Uyghur sentences with English references.
+- **Prompt source**: all conditions are rebuilt from the persisted analysis in `stats/flores_dev/dev.results.jsonl` — the parser/tagger/dictionary are not re-run for evaluation. The C7 (full) prompt was verified **byte-identical** to the live `PromptBuilder` output on all 997 sentences.
+- **Fairness constraint**: dictionary-only conditions look words up by *surface form*. Querying by disambiguated lemma would leak the morphology component into the dictionary arm.
+- **Downstream model**: Qwen3.5-9B (dense, officially supports Uyghur), greedy decoding (t=0), max 512 new tokens, native thinking mode force-disabled. Batch inference with vLLM directly in Python (no server).
+- **Scoring**: chrF++ (sacrebleu, `word_order=2`) and COMET (`Unbabel/wmt22-comet-da`), computed in a separate scoring venv.
+
+| # | Condition | Syntax | Morph | Dict |
+|---|---|:---:|:---:|:---:|
+| C0 | zero-shot baseline | ❌ | ❌ | ❌ |
+| C1 | syntax only | ✅ | ❌ | ❌ |
+| C2 | morphology only | ❌ | ✅ | ❌ |
+| C3 | dictionary only (surface-form lookup) | ❌ | ❌ | ✅ |
+| C4–C6 | pairwise combinations | | | |
+| C7 | full pipeline prompt | ✅ | ✅ | ✅ |
+
+#### Results
+
+Significance: exact paired bootstrap over sentence-level chrF++ statistics (10k resamples).
+
+| Condition | chrF++ | COMET | Δ chrF++ vs C0 | significant (p<0.05)? |
+|---|:---:|:---:|:---:|:---:|
+| C0 baseline | 47.63 | 0.8544 | — | — |
+| C1 syntax | 48.05 | 0.8537 | +0.42 | ✱ (p=0.042) |
+| C2 morph | 48.18 | 0.8535 | +0.55 | ✱ (p=0.008) |
+| **C3 dict** | **48.34** | **0.8568** | **+0.71** | **✱ (p=0.001)** |
+| C4 syntax+morph | 47.82 | 0.8517 | +0.19 | n.s. |
+| C5 syntax+dict | 47.86 | 0.8529 | +0.23 | n.s. |
+| C6 morph+dict | 47.94 | 0.8536 | +0.31 | n.s. |
+| C7 full | 47.71 | 0.8513 | +0.08 | n.s. (p=0.72) |
+
+#### Findings
+
+1. **Every single component helps on its own** — dictionary > morphology > syntax, all individually significant. The dictionary glosses are the strongest single addition.
+2. **Combining components cancels the gains.** All pairwise conditions and the full pipeline are statistically indistinguishable from the zero-shot baseline. At this model size the full 7-column table does not add information the model can use; it adds noise.
+3. Interpretation: at 9B the model already reads Uyghur well. What it is missing is not being fixed by telling it what it mostly knows. This raised the follow-up questions of Experiment 2: *does scale change this picture?*
+
+---
+
+### 5. End-to-End MT Evaluation — Model Scale & Thinking Mode (Experiment 2)
+
+#### Question
+Does the value of the linguistic context depend on model size? Two competing hypotheses:
+- **Equalizer**: small models lack Uyghur knowledge, so external context should help them most.
+- **Context overload**: small models cannot digest a long analysis table, so context should help only large models.
+
+#### Setup
+Same protocol as Experiment 1 (997 sentences, greedy, thinking off), varying only the model: dense Qwen3.5 at 0.8B / 2B / 4B / 9B / 27B, each with C0 (zero-shot) and C7 (full pipeline prompt). The reasoning regime is held constant (thinking off everywhere), so parameter scale is the only manipulated variable.
+
+#### Results (thinking off)
+
+| Model | C0 chrF++ / COMET | C7 chrF++ / COMET | Δ chrF++ [95% CI] | p |
+|---|:---:|:---:|:---:|:---:|
+| 0.8B | 23.39 / 0.6106 | 26.50 / 0.6520 | **+3.11** [+2.10, +4.13] | <0.0001 ✱ |
+| 2B | 35.29 / 0.7531 | 36.64 / 0.7624 | +1.35 [+0.66, +2.06] | 0.0002 ✱ |
+| 4B | 44.58 / 0.8355 | 45.48 / 0.8382 | +0.90 [+0.37, +1.40] | 0.0016 ✱ |
+| 9B | 47.65 / 0.8543 | 47.71 / 0.8513 | +0.06 [−0.41, +0.51] | 0.80 (n.s.) |
+| 27B | 51.03 / 0.8723 | 51.95 / 0.8706 | +0.92 [+0.47, +1.37] | 0.0002 ✱ |
+
+#### Findings
+
+1. **The Equalizer hypothesis wins at small scale.** The pipeline gains shrink monotonically with size (+3.11 → +1.35 → +0.90), disappear at 9B, and at 27B only chrF++ improves while COMET stays flat — the 27B gain is largely lexical/n-gram overlap, not meaning-level improvement.
+2. **At 0.8B the prompt also fixes degeneration.** The zero-shot baseline produces 26/997 length-capped and ~28 repetitive (looping) outputs; the full prompt reduces this to 14/16.
+3. **The glosses are doing real work at small scale.** Per-sentence Δ correlates with how much dictionary coverage the sentence has at 0.8B (low-coverage quartile +1.41 vs high-coverage quartiles up to +3.01), but shows no correlation at 9B (Spearman −0.01, p=0.71) — the 9B model simply does not consult the table.
+4. Overall: **in-context linguistic grounding substitutes for missing parametric knowledge.**
+
+#### Tier 2 — Thinking Mode ON vs OFF
+
+Setup: Qwen3.5's native thinking mode enabled via chat template, everything else unchanged. Two sampling arms: **greedy** (decoding identical to the runs above; 9B, 200-sentence subset) and **Qwen-recommended** (t=0.6, top_p=0.95, top_k=20; 9B/4B/27B, full set).
+
+A practical discovery first: with a 4,096-token budget **no run ever finished thinking** (0% answered) — Qwen3.5 reasons at ~5–6k tokens *median* on Uyghur (one coherent trace needed 5,751 tokens). We therefore raised the budget to 16,384 tokens for all thinking runs. "Answered" below means the model closed its reasoning block and produced a translation.
+
+| Arm | Model | Condition | Δ chrF++ (ON − OFF) | Δ COMET | answered |
+|---|---|---|:---:|:---:|:---:|
+| greedy | 9B | C0 | −5.41 | −0.105 | 76.5% |
+| greedy | 9B | C7 | **−24.21** | −0.299 | 37.0% |
+| recommended | 4B | C0 | −0.25 | −0.028 | 92.1% |
+| recommended | 4B | C7 | **−17.02** | −0.221 | 53.2% |
+| recommended | 9B | C0 | −2.87 | −0.049 | 88.4% |
+| recommended | 9B | C7 | −3.62 | −0.060 | 86.9% |
+| recommended | 27B | C0 | +1.81 | −0.001 | 98.9% |
+| recommended | 27B | C7 | −0.39 | −0.004 | 99.5% |
+
+Findings:
+1. **Thinking mode never reliably helps this task.** The only positive cell is 27B zero-shot chrF++ (COMET flat). Every other combination is neutral to disastrous.
+2. **The information-rich prompt destabilizes thinking.** With C7, models ruminate: the 4B keeps thinking until the token cap on 47% of sentences (score −17 chrF++), and even 9B under greedy drops to 37% answered. The same table that *helps* direct decoding becomes rumination fuel for the reasoner.
+3. External grounding and native reasoning are **substitutes, not complements**: grounding helps where models are small and don't think; thinking (marginally) helps where models are big and already know enough; combining both backfires.
+
+#### Diagnostics & Reproducibility Notes
+
+- **No evidence of benchmark memorization.** Outputs never closely reproduce the FLORES references (at most 2/997 sentences above chrF 95 across all baselines, and those are near-trivial). The good zero-shot scores reflect genuine (pretraining) knowledge, not recall.
+- **Tokenizer exposure check** (proxy for pretraining exposure): Arabic-script Uyghur costs Qwen3.5 5.44 tokens/word vs 1.25 for English — the script is represented in the tokenizer but heavily fragmented, consistent with real-but-thin Uyghur exposure.
+- **Near-determinism**: greedy vLLM decoding is batch-composition-sensitive; an independent re-run of the 9B baseline reproduced 927/997 translations exactly, with corpus scores within 0.02 chrF++.
+- All artifacts (per-sentence translations, metrics, summaries) are persisted in `experiments/exp1_component_ablation/results/`, `experiments/exp2_model_scaling/results/` and `experiments/exp2b_thinking_mode/results/`; scripts, protocol and exact commands are documented in `experiments/README.md`.
+
+---
+
 ## Component Status
 
 ### 1. Dependency Parser

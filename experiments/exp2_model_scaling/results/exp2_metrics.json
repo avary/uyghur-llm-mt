@@ -1,0 +1,191 @@
+{
+  "runs": [
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-0.8b_c0_baseline.results.jsonl",
+      "label": "Qwen3.5-0.8B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 23.39,
+      "comet": 0.6106
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-0.8b_c7_full.results.jsonl",
+      "label": "Qwen3.5-0.8B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 26.5,
+      "comet": 0.652
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-2b_c0_baseline.results.jsonl",
+      "label": "Qwen3.5-2B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 35.29,
+      "comet": 0.7531
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-2b_c7_full.results.jsonl",
+      "label": "Qwen3.5-2B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 36.64,
+      "comet": 0.7624
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-4b_c0_baseline.results.jsonl",
+      "label": "Qwen3.5-4B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 44.58,
+      "comet": 0.8355
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-4b_c7_full.results.jsonl",
+      "label": "Qwen3.5-4B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 45.48,
+      "comet": 0.8382
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-9b_c0_baseline.results.jsonl",
+      "label": "Qwen3.5-9B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 47.65,
+      "comet": 0.8543
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-9b_c7_full.results.jsonl",
+      "label": "Qwen3.5-9B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 47.71,
+      "comet": 0.8513
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-27b_c0_baseline.results.jsonl",
+      "label": "Qwen3.5-27B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 51.03,
+      "comet": 0.8723
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-27b_c7_full.results.jsonl",
+      "label": "Qwen3.5-27B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 51.95,
+      "comet": 0.8706
+    }
+  ],
+  "per_model_deltas": [
+    {
+      "model": "Qwen3.5-0.8B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-0.8b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-0.8B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 23.39,
+        "comet": 0.6106
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-0.8b_c7_full.results.jsonl",
+        "label": "Qwen3.5-0.8B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 26.5,
+        "comet": 0.652
+      },
+      "delta_chrfpp": 3.11,
+      "delta_comet": 0.0414
+    },
+    {
+      "model": "Qwen3.5-2B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-2b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-2B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 35.29,
+        "comet": 0.7531
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-2b_c7_full.results.jsonl",
+        "label": "Qwen3.5-2B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 36.64,
+        "comet": 0.7624
+      },
+      "delta_chrfpp": 1.35,
+      "delta_comet": 0.0093
+    },
+    {
+      "model": "Qwen3.5-4B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-4b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-4B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 44.58,
+        "comet": 0.8355
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-4b_c7_full.results.jsonl",
+        "label": "Qwen3.5-4B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 45.48,
+        "comet": 0.8382
+      },
+      "delta_chrfpp": 0.9,
+      "delta_comet": 0.0027
+    },
+    {
+      "model": "Qwen3.5-9B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-9b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-9B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 47.65,
+        "comet": 0.8543
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-9b_c7_full.results.jsonl",
+        "label": "Qwen3.5-9B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 47.71,
+        "comet": 0.8513
+      },
+      "delta_chrfpp": 0.06,
+      "delta_comet": -0.003
+    },
+    {
+      "model": "Qwen3.5-27B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-27b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-27B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 51.03,
+        "comet": 0.8723
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-27b_c7_full.results.jsonl",
+        "label": "Qwen3.5-27B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 51.95,
+        "comet": 0.8706
+      },
+      "delta_chrfpp": 0.92,
+      "delta_comet": -0.0017
+    }
+  ]
+}

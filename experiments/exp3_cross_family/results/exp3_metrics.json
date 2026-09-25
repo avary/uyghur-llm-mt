@@ -1,0 +1,423 @@
+{
+  "runs": [
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/llama-3.2-1b-instruct_c0_baseline.results.jsonl",
+      "label": "Llama-3.2-1B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 13.58,
+      "comet": 0.453
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/llama-3.2-1b-instruct_c7_full.results.jsonl",
+      "label": "Llama-3.2-1B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 11.7,
+      "comet": 0.393
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/ministral-3-3b-instruct-2512-bf16_c0_baseline.results.jsonl",
+      "label": "Ministral-3-3B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 14.83,
+      "comet": 0.47
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/ministral-3-3b-instruct-2512-bf16_c7_full.results.jsonl",
+      "label": "Ministral-3-3B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 18.92,
+      "comet": 0.5472
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/llama-3.2-3b-instruct_c0_baseline.results.jsonl",
+      "label": "Llama-3.2-3B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 19.15,
+      "comet": 0.4523
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/llama-3.2-3b-instruct_c7_full.results.jsonl",
+      "label": "Llama-3.2-3B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 21.65,
+      "comet": 0.5784
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/gemma-4-e2b-it_c0_baseline.results.jsonl",
+      "label": "Gemma-4-E2B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 16.48,
+      "comet": 0.4935
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/gemma-4-e2b-it_c7_full.results.jsonl",
+      "label": "Gemma-4-E2B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 35.42,
+      "comet": 0.7312
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/ministral-3-8b-instruct-2512-bf16_c0_baseline.results.jsonl",
+      "label": "Ministral-3-8B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 16.7,
+      "comet": 0.4904
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/ministral-3-8b-instruct-2512-bf16_c7_full.results.jsonl",
+      "label": "Ministral-3-8B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 25.65,
+      "comet": 0.6471
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/gemma-4-e4b-it_c0_baseline.results.jsonl",
+      "label": "Gemma-4-E4B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 25.71,
+      "comet": 0.6341
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/gemma-4-e4b-it_c7_full.results.jsonl",
+      "label": "Gemma-4-E4B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 41.84,
+      "comet": 0.7961
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/llama-3.1-8b-instruct_c0_baseline.results.jsonl",
+      "label": "Llama-3.1-8B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 32.04,
+      "comet": 0.6403
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/llama-3.1-8b-instruct_c7_full.results.jsonl",
+      "label": "Llama-3.1-8B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 36.56,
+      "comet": 0.6989
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/gemma-4-12b-it_c0_baseline.results.jsonl",
+      "label": "Gemma-4-12B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 45.62,
+      "comet": 0.8253
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/gemma-4-12b-it_c7_full.results.jsonl",
+      "label": "Gemma-4-12B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 46.69,
+      "comet": 0.835
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/ministral-3-14b-instruct-2512-bf16_c0_baseline.results.jsonl",
+      "label": "Ministral-3-14B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 17.17,
+      "comet": 0.4961
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/ministral-3-14b-instruct-2512-bf16_c7_full.results.jsonl",
+      "label": "Ministral-3-14B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 29.54,
+      "comet": 0.6945
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/gemma-4-31b-it_c0_baseline.results.jsonl",
+      "label": "Gemma-4-31B C0",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 50.2,
+      "comet": 0.8556
+    },
+    {
+      "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp3_cross_family/results/gemma-4-31b-it_c7_full.results.jsonl",
+      "label": "Gemma-4-31B C7",
+      "n": 997,
+      "n_failed": 0,
+      "chrfpp": 50.88,
+      "comet": 0.8628
+    }
+  ],
+  "per_model_deltas": [
+    {
+      "model": "Llama-3.2-1B",
+      "family": "Llama 3.2",
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "c0_chrfpp": 13.58,
+      "c7_chrfpp": 11.7,
+      "delta_chrfpp": -1.88,
+      "ci_lo": -2.46,
+      "ci_hi": -1.3,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.453,
+      "c7_comet": 0.393,
+      "delta_comet": -0.06
+    },
+    {
+      "model": "Ministral-3-3B",
+      "family": "Ministral 3",
+      "model_id": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+      "c0_chrfpp": 14.83,
+      "c7_chrfpp": 18.92,
+      "delta_chrfpp": 4.09,
+      "ci_lo": 3.69,
+      "ci_hi": 4.49,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.47,
+      "c7_comet": 0.5472,
+      "delta_comet": 0.0772
+    },
+    {
+      "model": "Llama-3.2-3B",
+      "family": "Llama 3.2",
+      "model_id": "meta-llama/Llama-3.2-3B-Instruct",
+      "c0_chrfpp": 19.15,
+      "c7_chrfpp": 21.65,
+      "delta_chrfpp": 2.5,
+      "ci_lo": 1.75,
+      "ci_hi": 3.24,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.4523,
+      "c7_comet": 0.5784,
+      "delta_comet": 0.1261
+    },
+    {
+      "model": "Gemma-4-E2B",
+      "family": "Gemma 4",
+      "model_id": "google/gemma-4-E2B-it",
+      "c0_chrfpp": 16.48,
+      "c7_chrfpp": 35.42,
+      "delta_chrfpp": 18.94,
+      "ci_lo": 18.46,
+      "ci_hi": 19.45,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.4935,
+      "c7_comet": 0.7312,
+      "delta_comet": 0.2377
+    },
+    {
+      "model": "Ministral-3-8B",
+      "family": "Ministral 3",
+      "model_id": "mistralai/Ministral-3-8B-Instruct-2512-BF16",
+      "c0_chrfpp": 16.7,
+      "c7_chrfpp": 25.65,
+      "delta_chrfpp": 8.96,
+      "ci_lo": 8.26,
+      "ci_hi": 9.65,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.4904,
+      "c7_comet": 0.6471,
+      "delta_comet": 0.1567
+    },
+    {
+      "model": "Gemma-4-E4B",
+      "family": "Gemma 4",
+      "model_id": "google/gemma-4-E4B-it",
+      "c0_chrfpp": 25.71,
+      "c7_chrfpp": 41.84,
+      "delta_chrfpp": 16.12,
+      "ci_lo": 15.39,
+      "ci_hi": 16.83,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.6341,
+      "c7_comet": 0.7961,
+      "delta_comet": 0.162
+    },
+    {
+      "model": "Llama-3.1-8B",
+      "family": "Llama 3.1",
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "c0_chrfpp": 32.04,
+      "c7_chrfpp": 36.56,
+      "delta_chrfpp": 4.52,
+      "ci_lo": 3.72,
+      "ci_hi": 5.3,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.6403,
+      "c7_comet": 0.6989,
+      "delta_comet": 0.0586
+    },
+    {
+      "model": "Gemma-4-12B",
+      "family": "Gemma 4",
+      "model_id": "google/gemma-4-12B-it",
+      "c0_chrfpp": 45.62,
+      "c7_chrfpp": 46.69,
+      "delta_chrfpp": 1.07,
+      "ci_lo": 0.56,
+      "ci_hi": 1.6,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.8253,
+      "c7_comet": 0.835,
+      "delta_comet": 0.0097
+    },
+    {
+      "model": "Ministral-3-14B",
+      "family": "Ministral 3",
+      "model_id": "mistralai/Ministral-3-14B-Instruct-2512-BF16",
+      "c0_chrfpp": 17.17,
+      "c7_chrfpp": 29.54,
+      "delta_chrfpp": 12.37,
+      "ci_lo": 11.63,
+      "ci_hi": 13.14,
+      "p_value": 0.0,
+      "significant": true,
+      "c0_comet": 0.4961,
+      "c7_comet": 0.6945,
+      "delta_comet": 0.1984
+    },
+    {
+      "model": "Gemma-4-31B",
+      "family": "Gemma 4",
+      "model_id": "google/gemma-4-31B-it",
+      "c0_chrfpp": 50.2,
+      "c7_chrfpp": 50.88,
+      "delta_chrfpp": 0.67,
+      "ci_lo": 0.17,
+      "ci_hi": 1.21,
+      "p_value": 0.0056,
+      "significant": true,
+      "c0_comet": 0.8556,
+      "c7_comet": 0.8628,
+      "delta_comet": 0.0072
+    }
+  ],
+  "qwen_reference": [
+    {
+      "model": "Qwen3.5-0.8B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-0.8b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-0.8B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 23.39,
+        "comet": 0.6106
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-0.8b_c7_full.results.jsonl",
+        "label": "Qwen3.5-0.8B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 26.5,
+        "comet": 0.652
+      },
+      "delta_chrfpp": 3.11,
+      "delta_comet": 0.0414
+    },
+    {
+      "model": "Qwen3.5-2B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-2b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-2B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 35.29,
+        "comet": 0.7531
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-2b_c7_full.results.jsonl",
+        "label": "Qwen3.5-2B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 36.64,
+        "comet": 0.7624
+      },
+      "delta_chrfpp": 1.35,
+      "delta_comet": 0.0093
+    },
+    {
+      "model": "Qwen3.5-4B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-4b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-4B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 44.58,
+        "comet": 0.8355
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-4b_c7_full.results.jsonl",
+        "label": "Qwen3.5-4B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 45.48,
+        "comet": 0.8382
+      },
+      "delta_chrfpp": 0.9,
+      "delta_comet": 0.0027
+    },
+    {
+      "model": "Qwen3.5-9B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-9b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-9B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 47.65,
+        "comet": 0.8543
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-9b_c7_full.results.jsonl",
+        "label": "Qwen3.5-9B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 47.71,
+        "comet": 0.8513
+      },
+      "delta_chrfpp": 0.06,
+      "delta_comet": -0.003
+    },
+    {
+      "model": "Qwen3.5-27B",
+      "baseline": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-27b_c0_baseline.results.jsonl",
+        "label": "Qwen3.5-27B C0",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 51.03,
+        "comet": 0.8723
+      },
+      "full": {
+        "path": "/home/hpc/b279bb/b279bb29/uyghur-llm-mt/experiments/exp2_model_scaling/results/qwen3.5-27b_c7_full.results.jsonl",
+        "label": "Qwen3.5-27B C7",
+        "n": 997,
+        "n_failed": 0,
+        "chrfpp": 51.95,
+        "comet": 0.8706
+      },
+      "delta_chrfpp": 0.92,
+      "delta_comet": -0.0017
+    }
+  ]
+}

@@ -2,3 +2,6 @@
 
 MUDT/xlm-roberta-base
 MUDT/exp
+.surface_dict_cache.json
+experiments/__pycache__
+experiments/*/__pycache__

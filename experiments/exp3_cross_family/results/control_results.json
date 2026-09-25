@@ -1,0 +1,140 @@
+{
+  "scores": {
+    "Ministral-3-8B|C0": {
+      "chrfpp": 16.7,
+      "comet": 0.4904
+    },
+    "Ministral-3-8B|C1": {
+      "chrfpp": 28.22,
+      "comet": 0.6585
+    },
+    "Ministral-3-8B|C2": {
+      "chrfpp": 25.56,
+      "comet": 0.6339
+    },
+    "Ministral-3-8B|C7": {
+      "chrfpp": 25.65,
+      "comet": 0.6471
+    },
+    "Gemma-4-E2B|C0": {
+      "chrfpp": 16.48,
+      "comet": 0.4935
+    },
+    "Gemma-4-E2B|C1": {
+      "chrfpp": 34.27,
+      "comet": 0.7124
+    },
+    "Gemma-4-E2B|C2": {
+      "chrfpp": 34.39,
+      "comet": 0.7159
+    },
+    "Gemma-4-E2B|C7": {
+      "chrfpp": 35.42,
+      "comet": 0.7312
+    }
+  },
+  "deltas": {
+    "Ministral-3-8B|C1\u2212C0": {
+      "delta": 11.52,
+      "ci_lo": 11.03,
+      "ci_hi": 12.0,
+      "p": 0.0
+    },
+    "Ministral-3-8B|C2\u2212C0": {
+      "delta": 8.86,
+      "ci_lo": 8.23,
+      "ci_hi": 9.53,
+      "p": 0.0
+    },
+    "Ministral-3-8B|C7\u2212C0": {
+      "delta": 8.96,
+      "ci_lo": 8.26,
+      "ci_hi": 9.65,
+      "p": 0.0
+    },
+    "Ministral-3-8B|C7\u2212C1": {
+      "delta": -2.56,
+      "ci_lo": -3.31,
+      "ci_hi": -1.84,
+      "p": 0.0
+    },
+    "Ministral-3-8B|C7\u2212C2": {
+      "delta": 0.1,
+      "ci_lo": -0.76,
+      "ci_hi": 0.93,
+      "p": 0.83
+    },
+    "Gemma-4-E2B|C1\u2212C0": {
+      "delta": 17.79,
+      "ci_lo": 17.33,
+      "ci_hi": 18.27,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|C2\u2212C0": {
+      "delta": 17.91,
+      "ci_lo": 17.4,
+      "ci_hi": 18.43,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|C7\u2212C0": {
+      "delta": 18.94,
+      "ci_lo": 18.46,
+      "ci_hi": 19.45,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|C7\u2212C1": {
+      "delta": 1.15,
+      "ci_lo": 0.76,
+      "ci_hi": 1.54,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|C7\u2212C2": {
+      "delta": 1.03,
+      "ci_lo": 0.58,
+      "ci_hi": 1.48,
+      "p": 0.0
+    }
+  },
+  "behavior": {
+    "Ministral-3-8B|C0": {
+      "len_capped": 47,
+      "echo": 0,
+      "avg_out_tok": 319
+    },
+    "Ministral-3-8B|C1": {
+      "len_capped": 2,
+      "echo": 0,
+      "avg_out_tok": 60
+    },
+    "Ministral-3-8B|C2": {
+      "len_capped": 23,
+      "echo": 0,
+      "avg_out_tok": 104
+    },
+    "Ministral-3-8B|C7": {
+      "len_capped": 37,
+      "echo": 0,
+      "avg_out_tok": 135
+    },
+    "Gemma-4-E2B|C0": {
+      "len_capped": 75,
+      "echo": 0,
+      "avg_out_tok": 376
+    },
+    "Gemma-4-E2B|C1": {
+      "len_capped": 0,
+      "echo": 0,
+      "avg_out_tok": 28
+    },
+    "Gemma-4-E2B|C2": {
+      "len_capped": 1,
+      "echo": 0,
+      "avg_out_tok": 29
+    },
+    "Gemma-4-E2B|C7": {
+      "len_capped": 0,
+      "echo": 0,
+      "avg_out_tok": 28
+    }
+  }
+}
