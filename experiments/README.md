@@ -202,6 +202,54 @@ comparable to `exp1_summary.md`.
 bash experiments/exp3_cross_family/run_ablation_full.sh   # batch-safe
 ```
 
+### Follow-up studies — S / C3L (`run_special.sh` / `score_special.py`)
+
+Two targeted follow-ups on the control models (+ Llama-1B/3B, + Qwen-9B):
+
+- **S (s_segmented)**: the exact C0 prompt with the sentence as a numbered
+  token list — no roles/lemmas/glosses/guidance. Tests whether clean word
+  separation alone explains the weak-model gains (presentation vs
+  information).
+- **C3L (c3_dict_lemma)**: dict-only table identical to C3, but glosses come
+  from the pipeline's lemma-keyed lookups (80.4% coverage) instead of
+  surface-form lookups (44.0% — every surface hit is also a lemma hit).
+  Tests how much lemmatization unlocks the dictionary. Qwen's C3 is re-run on
+  the post-441236a gloss format so the contrast is version-consistent.
+
+```bash
+bash experiments/exp3_cross_family/run_special.sh   # batch-safe
+```
+
+Outputs: `results/exp3_special.{json,md}` + `ANALYSIS.md` section (scores,
+COMET, behavior stats, paired bootstrap contrasts, offline lookup coverage
+analysis with lemma-only examples).
+
+## Experiment 4 — Agentic Retrieval (`exp4_agentic_retrieval/`)
+
+**Question**: can the LLM decide for itself what information it needs (pull),
+compared to the fixed lean/best push prompts (C3L) and the maximal C7 —
+and does agency value follow the capability axis (H1 selectivity pays /
+H2 protocol burden / H3 loop-as-anchor / H4 metacognition calibration)?
+
+Protocol: per-sentence agent episodes over the pipeline's information as
+six minimal tools (word_list, lemma, gloss, near_matches, features, syntax);
+round-synchronous batching; greedy, thinking off; calibrated caps 24/8/512.
+Models: Qwen3.5-9B, Gemma-4-E4B, Ministral-3-8B, Llama-3.1-8B.
+
+- `DESIGN.md` — full design (tool schemas, hypotheses, Phase 0)
+- `ANALYSIS.md` — Phase-0 verification record + full-run results
+- `tool_server.py` — schemas + execution against the persisted analysis
+- `agent_loop.py` — episode state machine + per-family tool-call parsing
+  (qwen3_coder / llama3_json / mistral / gemma4 via vLLM's registry)
+- `run_exp4.py` — driver (`--mode phase0|translate`)
+- `score_exp4.py` — quality + behavior + miss-path trichotomy + H4 calibration
+- `run_exp4.sh` — batch-safe wrapper (adds the two missing static C3L
+  baselines, runs E4-A/E4-B, scores)
+
+```bash
+bash experiments/exp4_agentic_retrieval/run_exp4.sh   # batch-safe
+```
+
 ## Post-hoc diagnostics (`experiments/common/diagnose_results.py`)
 
 Run in the scoring env after any experiment: computes (1) a memorization check

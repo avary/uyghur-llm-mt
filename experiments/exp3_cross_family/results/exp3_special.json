@@ -1,0 +1,382 @@
+{
+  "scores": {
+    "Ministral-3-8B|C0": {
+      "chrfpp": 16.7,
+      "comet": 0.4904
+    },
+    "Ministral-3-8B|C1": {
+      "chrfpp": 28.22,
+      "comet": 0.6585
+    },
+    "Ministral-3-8B|C3": {
+      "chrfpp": 27.74,
+      "comet": 0.6593
+    },
+    "Ministral-3-8B|S": {
+      "chrfpp": 13.28,
+      "comet": 0.4146
+    },
+    "Ministral-3-8B|C3L": {
+      "chrfpp": 29.6,
+      "comet": 0.6863
+    },
+    "Gemma-4-E2B|C0": {
+      "chrfpp": 16.48,
+      "comet": 0.4935
+    },
+    "Gemma-4-E2B|C1": {
+      "chrfpp": 34.27,
+      "comet": 0.7124
+    },
+    "Gemma-4-E2B|C3": {
+      "chrfpp": 35.84,
+      "comet": 0.7341
+    },
+    "Gemma-4-E2B|S": {
+      "chrfpp": 16.67,
+      "comet": 0.4423
+    },
+    "Gemma-4-E2B|C3L": {
+      "chrfpp": 36.79,
+      "comet": 0.7475
+    },
+    "Qwen3.5-9B|C0": {
+      "chrfpp": 47.63,
+      "comet": 0.8544
+    },
+    "Qwen3.5-9B|C1": {
+      "chrfpp": 48.05,
+      "comet": 0.8537
+    },
+    "Qwen3.5-9B|C3old": {
+      "chrfpp": 48.34,
+      "comet": 0.8568
+    },
+    "Qwen3.5-9B|C3": {
+      "chrfpp": 48.34,
+      "comet": 0.8568
+    },
+    "Qwen3.5-9B|S": {
+      "chrfpp": 38.16,
+      "comet": 0.711
+    },
+    "Qwen3.5-9B|C3L": {
+      "chrfpp": 48.32,
+      "comet": 0.8575
+    },
+    "Llama-3.2-3B|C0": {
+      "chrfpp": 19.15,
+      "comet": 0.4523
+    },
+    "Llama-3.2-3B|C1": {
+      "chrfpp": 23.19,
+      "comet": 0.6036
+    },
+    "Llama-3.2-3B|C7": {
+      "chrfpp": 21.65,
+      "comet": 0.5784
+    },
+    "Llama-3.2-3B|S": {
+      "chrfpp": 13.13,
+      "comet": 0.4138
+    },
+    "Llama-3.2-1B|C0": {
+      "chrfpp": 13.58,
+      "comet": 0.453
+    },
+    "Llama-3.2-1B|C1": {
+      "chrfpp": 13.04,
+      "comet": 0.4233
+    },
+    "Llama-3.2-1B|C7": {
+      "chrfpp": 11.7,
+      "comet": 0.393
+    },
+    "Llama-3.2-1B|S": {
+      "chrfpp": 12.85,
+      "comet": 0.386
+    }
+  },
+  "behavior": {
+    "Ministral-3-8B|C0": {
+      "len_capped": 47,
+      "preamble": 0,
+      "avg_out_tok": 319
+    },
+    "Ministral-3-8B|C1": {
+      "len_capped": 2,
+      "preamble": 1,
+      "avg_out_tok": 60
+    },
+    "Ministral-3-8B|C3": {
+      "len_capped": 24,
+      "preamble": 2,
+      "avg_out_tok": 93
+    },
+    "Ministral-3-8B|S": {
+      "len_capped": 531,
+      "preamble": 200,
+      "avg_out_tok": 458
+    },
+    "Ministral-3-8B|C3L": {
+      "len_capped": 13,
+      "preamble": 3,
+      "avg_out_tok": 81
+    },
+    "Gemma-4-E2B|C0": {
+      "len_capped": 75,
+      "preamble": 33,
+      "avg_out_tok": 376
+    },
+    "Gemma-4-E2B|C1": {
+      "len_capped": 0,
+      "preamble": 0,
+      "avg_out_tok": 28
+    },
+    "Gemma-4-E2B|C3": {
+      "len_capped": 0,
+      "preamble": 0,
+      "avg_out_tok": 29
+    },
+    "Gemma-4-E2B|S": {
+      "len_capped": 110,
+      "preamble": 991,
+      "avg_out_tok": 264
+    },
+    "Gemma-4-E2B|C3L": {
+      "len_capped": 0,
+      "preamble": 0,
+      "avg_out_tok": 28
+    },
+    "Qwen3.5-9B|C0": {
+      "len_capped": 0,
+      "preamble": 1,
+      "avg_out_tok": 28
+    },
+    "Qwen3.5-9B|C1": {
+      "len_capped": 0,
+      "preamble": 1,
+      "avg_out_tok": 28
+    },
+    "Qwen3.5-9B|C3old": {
+      "len_capped": 0,
+      "preamble": 1,
+      "avg_out_tok": 28
+    },
+    "Qwen3.5-9B|C3": {
+      "len_capped": 0,
+      "preamble": 1,
+      "avg_out_tok": 28
+    },
+    "Qwen3.5-9B|S": {
+      "len_capped": 0,
+      "preamble": 1,
+      "avg_out_tok": 56
+    },
+    "Qwen3.5-9B|C3L": {
+      "len_capped": 0,
+      "preamble": 1,
+      "avg_out_tok": 28
+    },
+    "Llama-3.2-3B|C0": {
+      "len_capped": 17,
+      "preamble": 697,
+      "avg_out_tok": 235
+    },
+    "Llama-3.2-3B|C1": {
+      "len_capped": 18,
+      "preamble": 0,
+      "avg_out_tok": 42
+    },
+    "Llama-3.2-3B|C7": {
+      "len_capped": 72,
+      "preamble": 10,
+      "avg_out_tok": 116
+    },
+    "Llama-3.2-3B|S": {
+      "len_capped": 170,
+      "preamble": 697,
+      "avg_out_tok": 298
+    },
+    "Llama-3.2-1B|C0": {
+      "len_capped": 14,
+      "preamble": 245,
+      "avg_out_tok": 54
+    },
+    "Llama-3.2-1B|C1": {
+      "len_capped": 163,
+      "preamble": 0,
+      "avg_out_tok": 262
+    },
+    "Llama-3.2-1B|C7": {
+      "len_capped": 621,
+      "preamble": 8,
+      "avg_out_tok": 391
+    },
+    "Llama-3.2-1B|S": {
+      "len_capped": 78,
+      "preamble": 0,
+      "avg_out_tok": 234
+    }
+  },
+  "contrasts": {
+    "Ministral-3-8B|S−C0": {
+      "desc": "S − C0 (presentation only)",
+      "delta": -3.41,
+      "ci_lo": -3.63,
+      "ci_hi": -3.2,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|S−C0": {
+      "desc": "S − C0 (presentation only)",
+      "delta": 0.19,
+      "ci_lo": -0.14,
+      "ci_hi": 0.51,
+      "p": 0.2688
+    },
+    "Qwen3.5-9B|S−C0": {
+      "desc": "S − C0 (presentation only)",
+      "delta": -9.46,
+      "ci_lo": -10.19,
+      "ci_hi": -8.73,
+      "p": 0.0
+    },
+    "Llama-3.2-3B|S−C0": {
+      "desc": "S − C0 (presentation only)",
+      "delta": -6.02,
+      "ci_lo": -6.46,
+      "ci_hi": -5.59,
+      "p": 0.0
+    },
+    "Llama-3.2-1B|S−C0": {
+      "desc": "S − C0 (presentation only)",
+      "delta": -0.74,
+      "ci_lo": -1.33,
+      "ci_hi": -0.16,
+      "p": 0.0128
+    },
+    "Ministral-3-8B|S−C1": {
+      "desc": "S − C1 (presentation vs roles)",
+      "delta": -14.93,
+      "ci_lo": -15.45,
+      "ci_hi": -14.41,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|S−C1": {
+      "desc": "S − C1 (presentation vs roles)",
+      "delta": -17.6,
+      "ci_lo": -18.19,
+      "ci_hi": -17.03,
+      "p": 0.0
+    },
+    "Qwen3.5-9B|S−C1": {
+      "desc": "S − C1 (presentation vs roles)",
+      "delta": -9.89,
+      "ci_lo": -10.61,
+      "ci_hi": -9.13,
+      "p": 0.0
+    },
+    "Llama-3.2-3B|S−C1": {
+      "desc": "S − C1 (presentation vs roles)",
+      "delta": -10.06,
+      "ci_lo": -10.81,
+      "ci_hi": -9.28,
+      "p": 0.0
+    },
+    "Llama-3.2-1B|S−C1": {
+      "desc": "S − C1 (presentation vs roles)",
+      "delta": -0.19,
+      "ci_lo": -0.6,
+      "ci_hi": 0.22,
+      "p": 0.3564
+    },
+    "Ministral-3-8B|C3L−C3": {
+      "desc": "C3L − C3 (lemma-keyed dict)",
+      "delta": 1.86,
+      "ci_lo": 1.13,
+      "ci_hi": 2.57,
+      "p": 0.0
+    },
+    "Ministral-3-8B|C3L−C1": {
+      "desc": "C3L − C1 (lemma-dict vs roles)",
+      "delta": 1.39,
+      "ci_lo": 0.68,
+      "ci_hi": 2.06,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|C3L−C3": {
+      "desc": "C3L − C3 (lemma-keyed dict)",
+      "delta": 0.95,
+      "ci_lo": 0.6,
+      "ci_hi": 1.29,
+      "p": 0.0
+    },
+    "Gemma-4-E2B|C3L−C1": {
+      "desc": "C3L − C1 (lemma-dict vs roles)",
+      "delta": 2.52,
+      "ci_lo": 2.13,
+      "ci_hi": 2.91,
+      "p": 0.0
+    },
+    "Qwen3.5-9B|C3L−C3": {
+      "desc": "C3L − C3 (lemma-keyed dict)",
+      "delta": -0.02,
+      "ci_lo": -0.28,
+      "ci_hi": 0.23,
+      "p": 0.8648
+    },
+    "Qwen3.5-9B|C3L−C1": {
+      "desc": "C3L − C1 (lemma-dict vs roles)",
+      "delta": 0.26,
+      "ci_lo": -0.08,
+      "ci_hi": 0.6,
+      "p": 0.138
+    },
+    "Qwen3.5-9B|C3−C3old": {
+      "desc": "C3(new gloss fmt) − C3(old fmt)",
+      "delta": 0.0,
+      "ci_lo": 0.0,
+      "ci_hi": 0.0,
+      "p": 2.0
+    },
+    "Llama-3.2-1B|C1−C0": {
+      "desc": "C1 − C0 (floor: lean prompt)",
+      "delta": -0.55,
+      "ci_lo": -1.16,
+      "ci_hi": 0.06,
+      "p": 0.0772
+    },
+    "Llama-3.2-1B|C7−C1": {
+      "desc": "C7 − C1 (floor: full prompt)",
+      "delta": -1.34,
+      "ci_lo": -1.76,
+      "ci_hi": -0.93,
+      "p": 0.0
+    }
+  },
+  "lookup_analysis": {
+    "n_content_tokens": 17159,
+    "lemma_hit_rate": 0.8042,
+    "surface_hit_rate": 0.4403,
+    "both_hit_rate": 0.4403,
+    "lemma_only_rate": 0.3639,
+    "surface_only_rate": 0.0,
+    "lemma_only_examples": [
+      {
+        "form": "كۈنى",
+        "lemma": "كۈن",
+        "gloss": "kün (n.): 1. [astronomy] Sun / 2. Day / 3. Life; existence"
+      },
+      {
+        "form": "ئۇنىۋېرسىتېتى",
+        "lemma": "ئۇنىۋېرسىتېت",
+        "gloss": "uniwërsitët (n.): University"
+      },
+      {
+        "form": "ئالىملىرى",
+        "lemma": "ئالىم",
+        "gloss": "alim (n.): 1. Scholar; learned person / 2. Male name"
+      }
+    ]
+  }
+}

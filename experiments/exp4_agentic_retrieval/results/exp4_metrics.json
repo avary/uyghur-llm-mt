@@ -1,0 +1,514 @@
+{
+  "scores": {
+    "Qwen3.5-9B|C0": {
+      "chrfpp": 47.63,
+      "comet": 0.8544
+    },
+    "Qwen3.5-9B|C3L": {
+      "chrfpp": 48.32,
+      "comet": 0.8575
+    },
+    "Qwen3.5-9B|E4-A": {
+      "chrfpp": 43.56,
+      "comet": 0.8216
+    },
+    "Qwen3.5-9B|E4-B": {
+      "chrfpp": 43.69,
+      "comet": 0.8322
+    },
+    "Gemma-4-E4B|C0": {
+      "chrfpp": 25.71,
+      "comet": 0.6341
+    },
+    "Gemma-4-E4B|C3L": {
+      "chrfpp": 42.86,
+      "comet": 0.8078
+    },
+    "Gemma-4-E4B|E4-A": {
+      "chrfpp": 38.12,
+      "comet": 0.7731
+    },
+    "Gemma-4-E4B|E4-B": {
+      "chrfpp": 40.56,
+      "comet": 0.7876
+    },
+    "Ministral-3-8B|C0": {
+      "chrfpp": 16.7,
+      "comet": 0.4904
+    },
+    "Ministral-3-8B|C3L": {
+      "chrfpp": 29.6,
+      "comet": 0.6863
+    },
+    "Ministral-3-8B|E4-A": {
+      "chrfpp": 18.95,
+      "comet": 0.4929
+    },
+    "Ministral-3-8B|E4-B": {
+      "chrfpp": 16.82,
+      "comet": 0.481
+    },
+    "Llama-3.1-8B|C0": {
+      "chrfpp": 32.04,
+      "comet": 0.6403
+    },
+    "Llama-3.1-8B|C3L": {
+      "chrfpp": 37.06,
+      "comet": 0.7078
+    },
+    "Llama-3.1-8B|E4-A": {
+      "chrfpp": 31.01,
+      "comet": 0.6103
+    },
+    "Llama-3.1-8B|E4-B": {
+      "chrfpp": 31.73,
+      "comet": 0.6252
+    }
+  },
+  "contrasts": {
+    "Qwen3.5-9B|E4-A−C0": {
+      "desc": "E4-A − C0 (agency vs nothing)",
+      "delta": -4.07,
+      "ci_lo": -5.27,
+      "ci_hi": -2.91,
+      "p": 0.0
+    },
+    "Qwen3.5-9B|E4-A−C3L": {
+      "desc": "E4-A − C3L (pull vs best push)",
+      "delta": -4.76,
+      "ci_lo": -5.89,
+      "ci_hi": -3.67,
+      "p": 0.0
+    },
+    "Qwen3.5-9B|E4-A−E4-B": {
+      "desc": "E4-A − E4-B (offering more tools)",
+      "delta": -0.13,
+      "ci_lo": -1.57,
+      "ci_hi": 1.32,
+      "p": 0.856
+    },
+    "Gemma-4-E4B|E4-A−C0": {
+      "desc": "E4-A − C0 (agency vs nothing)",
+      "delta": 12.4,
+      "ci_lo": 11.42,
+      "ci_hi": 13.36,
+      "p": 0.0
+    },
+    "Gemma-4-E4B|E4-A−C3L": {
+      "desc": "E4-A − C3L (pull vs best push)",
+      "delta": -4.74,
+      "ci_lo": -5.6,
+      "ci_hi": -3.91,
+      "p": 0.0
+    },
+    "Gemma-4-E4B|E4-A−E4-B": {
+      "desc": "E4-A − E4-B (offering more tools)",
+      "delta": -2.45,
+      "ci_lo": -3.24,
+      "ci_hi": -1.63,
+      "p": 0.0
+    },
+    "Ministral-3-8B|E4-A−C0": {
+      "desc": "E4-A − C0 (agency vs nothing)",
+      "delta": 2.26,
+      "ci_lo": 1.9,
+      "ci_hi": 2.6,
+      "p": 0.0
+    },
+    "Ministral-3-8B|E4-A−C3L": {
+      "desc": "E4-A − C3L (pull vs best push)",
+      "delta": -10.65,
+      "ci_lo": -11.32,
+      "ci_hi": -9.99,
+      "p": 0.0
+    },
+    "Ministral-3-8B|E4-A−E4-B": {
+      "desc": "E4-A − E4-B (offering more tools)",
+      "delta": 2.14,
+      "ci_lo": 1.81,
+      "ci_hi": 2.47,
+      "p": 0.0
+    },
+    "Llama-3.1-8B|E4-A−C0": {
+      "desc": "E4-A − C0 (agency vs nothing)",
+      "delta": -1.03,
+      "ci_lo": -2.0,
+      "ci_hi": -0.09,
+      "p": 0.0328
+    },
+    "Llama-3.1-8B|E4-A−C3L": {
+      "desc": "E4-A − C3L (pull vs best push)",
+      "delta": -6.04,
+      "ci_lo": -6.88,
+      "ci_hi": -5.23,
+      "p": 0.0
+    },
+    "Llama-3.1-8B|E4-A−E4-B": {
+      "desc": "E4-A − E4-B (offering more tools)",
+      "delta": -0.71,
+      "ci_lo": -1.57,
+      "ci_hi": 0.14,
+      "p": 0.0948
+    }
+  },
+  "behavior": {
+    "Qwen3.5-9B|E4-A": {
+      "n": 997,
+      "calls_mean": 7.8,
+      "calls_p50": 0.0,
+      "calls_max": 24,
+      "episodes_with_calls": 408,
+      "rounds_mean": 2.7,
+      "finish": {
+        "final": 852,
+        "budget_forced": 145
+      },
+      "tool_mix": {
+        "get_word_list": 391,
+        "get_gloss": 5712,
+        "get_lemma": 1112,
+        "get_near_matches": 321,
+        "get_features": 196,
+        "get_syntax": 67
+      },
+      "resolution": {
+        "null": 458,
+        "token_id": 6913,
+        "stem_prefix": 80,
+        "unresolved": 29,
+        "exact": 309,
+        "edit_distance_1": 5,
+        "token_id_invalid": 2,
+        "ambiguous": 3
+      },
+      "addressing": {
+        "token_id": 6915,
+        "word": 426
+      },
+      "n_parse_failures": 0,
+      "n_skipped_calls": 334,
+      "n_unresolved": 34,
+      "tokens_in_mean": 5524,
+      "tokens_out_mean": 287,
+      "degenerate_finals": 1,
+      "miss_path": {
+        "explored_lemma": 0.733,
+        "accepted_unknown": 0.141,
+        "explored_near": 0.098,
+        "n_misses": 1363
+      }
+    },
+    "Qwen3.5-9B|E4-B": {
+      "n": 997,
+      "calls_mean": 4.7,
+      "calls_p50": 0.0,
+      "calls_max": 24,
+      "episodes_with_calls": 397,
+      "rounds_mean": 1.9,
+      "finish": {
+        "final": 989,
+        "budget_forced": 8
+      },
+      "tool_mix": {
+        "get_word_list": 396,
+        "get_gloss": 4270
+      },
+      "resolution": {
+        "null": 396,
+        "token_id": 3917,
+        "exact": 278,
+        "stem_prefix": 49,
+        "unresolved": 23,
+        "edit_distance_1": 3
+      },
+      "addressing": {
+        "token_id": 3917,
+        "word": 353
+      },
+      "n_parse_failures": 0,
+      "n_skipped_calls": 27,
+      "n_unresolved": 23,
+      "tokens_in_mean": 1952,
+      "tokens_out_mean": 182,
+      "degenerate_finals": 0,
+      "miss_path": {
+        "accepted_unknown": 0.829,
+        "n_misses": 1259
+      }
+    },
+    "Gemma-4-E4B|E4-A": {
+      "n": 997,
+      "calls_mean": 1.5,
+      "calls_p50": 0.0,
+      "calls_max": 8,
+      "episodes_with_calls": 184,
+      "rounds_mean": 2.5,
+      "finish": {
+        "final": 997
+      },
+      "tool_mix": {
+        "get_word_list": 183,
+        "get_gloss": 1266,
+        "get_syntax": 5,
+        "get_near_matches": 6,
+        "get_lemma": 9
+      },
+      "resolution": {
+        "null": 188,
+        "token_id": 1279,
+        "exact": 2
+      },
+      "addressing": {
+        "token_id": 1279,
+        "word": 2
+      },
+      "n_parse_failures": 0,
+      "n_skipped_calls": 0,
+      "n_unresolved": 0,
+      "tokens_in_mean": 3103,
+      "tokens_out_mean": 70,
+      "degenerate_finals": 0,
+      "miss_path": {
+        "accepted_unknown": 0.949,
+        "explored_lemma": 0.033,
+        "explored_near": 0.015,
+        "n_misses": 274
+      }
+    },
+    "Gemma-4-E4B|E4-B": {
+      "n": 997,
+      "calls_mean": 0.0,
+      "calls_p50": 0.0,
+      "calls_max": 8,
+      "episodes_with_calls": 2,
+      "rounds_mean": 1.0,
+      "finish": {
+        "final": 997
+      },
+      "tool_mix": {
+        "get_word_list": 2,
+        "get_gloss": 14
+      },
+      "resolution": {
+        "null": 2,
+        "token_id": 14
+      },
+      "addressing": {
+        "token_id": 14
+      },
+      "n_parse_failures": 0,
+      "n_skipped_calls": 0,
+      "n_unresolved": 0,
+      "tokens_in_mean": 443,
+      "tokens_out_mean": 28,
+      "degenerate_finals": 0,
+      "miss_path": {
+        "accepted_unknown": 1.0,
+        "n_misses": 2
+      }
+    },
+    "Ministral-3-8B|E4-A": {
+      "n": 997,
+      "calls_mean": 22.8,
+      "calls_p50": 24.0,
+      "calls_max": 24,
+      "episodes_with_calls": 997,
+      "rounds_mean": 5.0,
+      "finish": {
+        "budget_forced": 751,
+        "final": 246
+      },
+      "tool_mix": {
+        "get_word_list": 998,
+        "get_gloss": 14367,
+        "get_lemma": 4178,
+        "get_features": 1383,
+        "get_syntax": 572,
+        "get_near_matches": 1234
+      },
+      "resolution": {
+        "null": 1575,
+        "exact": 19456,
+        "edit_distance_1": 288,
+        "unresolved": 520,
+        "stem_prefix": 526,
+        "token_id": 329,
+        "ambiguous": 43
+      },
+      "addressing": {
+        "word": 20833,
+        "token_id": 329
+      },
+      "n_parse_failures": 0,
+      "n_skipped_calls": 2645,
+      "n_unresolved": 563,
+      "tokens_in_mean": 10147,
+      "tokens_out_mean": 721,
+      "degenerate_finals": 135,
+      "miss_path": {
+        "accepted_unknown": 0.293,
+        "explored_lemma": 0.421,
+        "explored_near": 0.229,
+        "n_misses": 3286
+      }
+    },
+    "Ministral-3-8B|E4-B": {
+      "n": 997,
+      "calls_mean": 19.4,
+      "calls_p50": 20.0,
+      "calls_max": 24,
+      "episodes_with_calls": 997,
+      "rounds_mean": 4.7,
+      "finish": {
+        "budget_forced": 340,
+        "final": 657
+      },
+      "tool_mix": {
+        "get_word_list": 1007,
+        "get_gloss": 18330
+      },
+      "resolution": {
+        "null": 1514,
+        "exact": 13836,
+        "edit_distance_1": 298,
+        "token_id": 2957,
+        "stem_prefix": 649,
+        "unresolved": 528,
+        "ambiguous": 62
+      },
+      "addressing": {
+        "word": 15357,
+        "token_id": 2974
+      },
+      "n_parse_failures": 68,
+      "n_skipped_calls": 1706,
+      "n_unresolved": 590,
+      "tokens_in_mean": 6174,
+      "tokens_out_mean": 783,
+      "degenerate_finals": 74,
+      "miss_path": {
+        "accepted_unknown": 0.422,
+        "n_misses": 6861
+      }
+    },
+    "Llama-3.1-8B|E4-A": {
+      "n": 997,
+      "calls_mean": 0.3,
+      "calls_p50": 0.0,
+      "calls_max": 6,
+      "episodes_with_calls": 319,
+      "rounds_mean": 3.5,
+      "finish": {
+        "final": 996,
+        "context_overflow": 1
+      },
+      "tool_mix": {
+        "get_word_list": 313,
+        "get_gloss": 14,
+        "get_syntax": 1,
+        "get_lemma": 1
+      },
+      "resolution": {
+        "null": 316,
+        "unresolved": 6,
+        "edit_distance_1": 2,
+        "token_id": 7
+      },
+      "addressing": {
+        "word": 8,
+        "token_id": 7
+      },
+      "n_parse_failures": 2210,
+      "n_skipped_calls": 3504,
+      "n_unresolved": 6,
+      "tokens_in_mean": 8404,
+      "tokens_out_mean": 1368,
+      "degenerate_finals": 1,
+      "miss_path": {
+        "explored_lemma": 1.0,
+        "n_misses": 1
+      }
+    },
+    "Llama-3.1-8B|E4-B": {
+      "n": 997,
+      "calls_mean": 0.2,
+      "calls_p50": 0.0,
+      "calls_max": 4,
+      "episodes_with_calls": 241,
+      "rounds_mean": 3.4,
+      "finish": {
+        "final": 994,
+        "context_overflow": 2,
+        "round_cap": 1
+      },
+      "tool_mix": {
+        "get_word_list": 239,
+        "get_gloss": 5
+      },
+      "resolution": {
+        "null": 240,
+        "exact": 1,
+        "unresolved": 4
+      },
+      "addressing": {
+        "word": 5
+      },
+      "n_parse_failures": 2129,
+      "n_skipped_calls": 2561,
+      "n_unresolved": 4,
+      "tokens_in_mean": 6108,
+      "tokens_out_mean": 1287,
+      "degenerate_finals": 2
+    }
+  },
+  "calibration": {
+    "Qwen3.5-9B|E4-A": {
+      "gloss_fetches": 5445,
+      "needed_tokens": 3504,
+      "recall": 0.32,
+      "precision": 0.206
+    },
+    "Qwen3.5-9B|E4-B": {
+      "gloss_fetches": 4018,
+      "needed_tokens": 3504,
+      "recall": 0.24,
+      "precision": 0.209
+    },
+    "Gemma-4-E4B|E4-A": {
+      "gloss_fetches": 1264,
+      "needed_tokens": 3085,
+      "recall": 0.077,
+      "precision": 0.189
+    },
+    "Gemma-4-E4B|E4-B": {
+      "gloss_fetches": 14,
+      "needed_tokens": 3085,
+      "recall": 0.001,
+      "precision": 0.143
+    },
+    "Ministral-3-8B|E4-A": {
+      "gloss_fetches": 13250,
+      "needed_tokens": 3495,
+      "recall": 0.829,
+      "precision": 0.219
+    },
+    "Ministral-3-8B|E4-B": {
+      "gloss_fetches": 13213,
+      "needed_tokens": 3495,
+      "recall": 0.837,
+      "precision": 0.222
+    },
+    "Llama-3.1-8B|E4-A": {
+      "gloss_fetches": 7,
+      "needed_tokens": 3373,
+      "recall": 0.0,
+      "precision": 0.143
+    },
+    "Llama-3.1-8B|E4-B": {
+      "gloss_fetches": 1,
+      "needed_tokens": 3373,
+      "recall": 0.0,
+      "precision": 0.0
+    }
+  }
+}

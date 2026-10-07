@@ -65,6 +65,8 @@ class Condition:
     morph: bool
     dictionary: bool
     description: str
+    lemma_keyed: bool = False  # dictionary column from persisted lemma lookups
+                               # (C3L) instead of surface lookups (C3)
 
 
 CONDITIONS: List[Condition] = [
@@ -78,15 +80,30 @@ CONDITIONS: List[Condition] = [
     Condition("C7", "c7_full",        True,  True,  True,  "Full pipeline (Syntax + Morphology + Dictionary)"),
 ]
 
-CONDITIONS_BY_ID = {c.cid: c for c in CONDITIONS}
+# Special follow-up conditions (Exp 3 studies). Kept OUT of `CONDITIONS` so the
+# exp1/exp2 drivers' default condition lists are unchanged.
+#   S   : presentation-only — the exact C0 prompt with the sentence as a
+#         numbered token list (no roles/lemmas/glosses/guidance). Tests the
+#         "clean word separation" hypothesis.
+#   C3L : dict-only table identical to C3, but the dictionary column comes
+#         from the pipeline's LEMMA-keyed lookups (80.4% coverage) instead of
+#         surface-form lookups (44.0%). Tests the lemma-vs-surface ablation.
+SPECIAL_CONDITIONS: List[Condition] = [
+    Condition("S", "s_segmented", False, False, False,
+              "Zero-shot, words in a numbered list (presentation-only)"),
+    Condition("C3L", "c3_dict_lemma", False, False, True,
+              "+ Dictionary (lemma-keyed lookups)", lemma_keyed=True),
+]
+
+CONDITIONS_BY_ID = {c.cid: c for c in CONDITIONS + SPECIAL_CONDITIONS}
 
 
 def get_condition(cid_or_name: str) -> Condition:
-    """Accept 'C7', 'c7_full', or 'full'."""
+    """Accept 'C7', 'c7_full', 'S', 'C3L', or 'full'."""
     key = cid_or_name.strip()
     if key in CONDITIONS_BY_ID:
         return CONDITIONS_BY_ID[key]
-    for c in CONDITIONS:
+    for c in CONDITIONS + SPECIAL_CONDITIONS:
         if c.name == key or c.name.endswith("_" + key):
             return c
     raise KeyError(f"Unknown condition: {cid_or_name!r}")
@@ -288,6 +305,17 @@ def build_prompt(cond: Condition, sentence: str, tokens: List[dict],
 
     `tokens` = the per_token list from dev.results.jsonl for this sentence.
     """
+    # -- S: presentation-only (C0 text, sentence as numbered token list) --------
+    if cond.cid == "S":
+        tok_lines = "\n".join(f"{t['id']}. {t['form']}" for t in tokens)
+        return (
+            "You are an expert Uyghur-to-English translator.\n"
+            "Translate the following Uyghur sentence into fluent, accurate English.\n\n"
+            "### Uyghur Source Sentence:\n"
+            f"{tok_lines}\n\n"
+            "### English Translation:"
+        )
+
     # -- C0: zero-shot -------------------------------------------------------
     if not (cond.syntax or cond.morph or cond.dictionary):
         return (
@@ -302,8 +330,8 @@ def build_prompt(cond: Condition, sentence: str, tokens: List[dict],
     glosses: List[Optional[str]] = [None] * len(tokens)
     nears: List[List[dict]] = [[] for _ in tokens]
     if cond.dictionary:
-        if cond.morph:
-            # Reuse the pipeline's own lemma-based hits (C7 parity).
+        if cond.morph or cond.lemma_keyed:
+            # Pipeline's own lemma-based hits (C6/C7/C3L parity).
             for i, t in enumerate(tokens):
                 glosses[i] = t["gloss"] if t["has_dict"] else None
                 nears[i] = t["near"] or []

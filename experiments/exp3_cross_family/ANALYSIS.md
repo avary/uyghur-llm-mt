@@ -288,3 +288,156 @@ script-literate, and drop the morphological-features column whenever the
 model is small or its Uyghur exposure is unknown. The maximal table is
 2.25× the tokens of the lean optimum (1,753 vs 780 prompt tokens in
 Ministral's tokenizer) and delivers less in every regime measured.
+
+## Follow-up studies — segmentation (S) and lemma-keyed dictionary (C3L)
+
+### Ministral-3-8B
+
+| Cond | chrF++ | COMET | len-cap | preamble | avg out tok |
+|---|---|---|---|---|---|
+| C0 | 16.70 | 0.4904 | 47 | 0 | 319 |
+| C1 | 28.22 | 0.6585 | 2 | 1 | 60 |
+| C3 | 27.74 | 0.6593 | 24 | 2 | 93 |
+| S | 13.28 | 0.4146 | 531 | 200 | 458 |
+| C3L | 29.60 | 0.6863 | 13 | 3 | 81 |
+
+### Gemma-4-E2B
+
+| Cond | chrF++ | COMET | len-cap | preamble | avg out tok |
+|---|---|---|---|---|---|
+| C0 | 16.48 | 0.4935 | 75 | 33 | 376 |
+| C1 | 34.27 | 0.7124 | 0 | 0 | 28 |
+| C3 | 35.84 | 0.7341 | 0 | 0 | 29 |
+| S | 16.67 | 0.4423 | 110 | 991 | 264 |
+| C3L | 36.79 | 0.7475 | 0 | 0 | 28 |
+
+### Qwen3.5-9B
+
+| Cond | chrF++ | COMET | len-cap | preamble | avg out tok |
+|---|---|---|---|---|---|
+| C0 | 47.63 | 0.8544 | 0 | 1 | 28 |
+| C1 | 48.05 | 0.8537 | 0 | 1 | 28 |
+| C3old | 48.34 | 0.8568 | 0 | 1 | 28 |
+| C3 | 48.34 | 0.8568 | 0 | 1 | 28 |
+| S | 38.16 | 0.7110 | 0 | 1 | 56 |
+| C3L | 48.32 | 0.8575 | 0 | 1 | 28 |
+
+### Llama-3.2-3B
+
+| Cond | chrF++ | COMET | len-cap | preamble | avg out tok |
+|---|---|---|---|---|---|
+| C0 | 19.15 | 0.4523 | 17 | 697 | 235 |
+| C1 | 23.19 | 0.6036 | 18 | 0 | 42 |
+| C7 | 21.65 | 0.5784 | 72 | 10 | 116 |
+| S | 13.13 | 0.4138 | 170 | 697 | 298 |
+
+### Llama-3.2-1B
+
+| Cond | chrF++ | COMET | len-cap | preamble | avg out tok |
+|---|---|---|---|---|---|
+| C0 | 13.58 | 0.4530 | 14 | 245 | 54 |
+| C1 | 13.04 | 0.4233 | 163 | 0 | 262 |
+| C7 | 11.70 | 0.3930 | 621 | 8 | 391 |
+| S | 12.85 | 0.3860 | 78 | 0 | 234 |
+
+### Paired bootstrap contrasts (chrF++)
+
+| Model | Contrast | Δ [95% CI] | p |
+|---|---|---|---|
+| Ministral-3-8B | S − C0 (presentation only) | -3.41 [-3.63, -3.20] ✱ | 0.0000 |
+| Gemma-4-E2B | S − C0 (presentation only) | +0.19 [-0.14, +0.51] | 0.2688 |
+| Qwen3.5-9B | S − C0 (presentation only) | -9.46 [-10.19, -8.73] ✱ | 0.0000 |
+| Llama-3.2-3B | S − C0 (presentation only) | -6.02 [-6.46, -5.59] ✱ | 0.0000 |
+| Llama-3.2-1B | S − C0 (presentation only) | -0.74 [-1.33, -0.16] ✱ | 0.0128 |
+| Ministral-3-8B | S − C1 (presentation vs roles) | -14.93 [-15.45, -14.41] ✱ | 0.0000 |
+| Gemma-4-E2B | S − C1 (presentation vs roles) | -17.60 [-18.19, -17.03] ✱ | 0.0000 |
+| Qwen3.5-9B | S − C1 (presentation vs roles) | -9.89 [-10.61, -9.13] ✱ | 0.0000 |
+| Llama-3.2-3B | S − C1 (presentation vs roles) | -10.06 [-10.81, -9.28] ✱ | 0.0000 |
+| Llama-3.2-1B | S − C1 (presentation vs roles) | -0.19 [-0.60, +0.22] | 0.3564 |
+| Ministral-3-8B | C3L − C3 (lemma-keyed dict) | +1.86 [+1.13, +2.57] ✱ | 0.0000 |
+| Ministral-3-8B | C3L − C1 (lemma-dict vs roles) | +1.39 [+0.68, +2.06] ✱ | 0.0000 |
+| Gemma-4-E2B | C3L − C3 (lemma-keyed dict) | +0.95 [+0.60, +1.29] ✱ | 0.0000 |
+| Gemma-4-E2B | C3L − C1 (lemma-dict vs roles) | +2.52 [+2.13, +2.91] ✱ | 0.0000 |
+| Qwen3.5-9B | C3L − C3 (lemma-keyed dict) | -0.02 [-0.28, +0.23] | 0.8648 |
+| Qwen3.5-9B | C3L − C1 (lemma-dict vs roles) | +0.26 [-0.08, +0.60] | 0.1380 |
+| Qwen3.5-9B | C3(new gloss fmt) − C3(old fmt) | +0.00 [+0.00, +0.00] | 2.0000 |
+| Llama-3.2-1B | C1 − C0 (floor: lean prompt) | -0.55 [-1.16, +0.06] | 0.0772 |
+| Llama-3.2-1B | C7 − C1 (floor: full prompt) | -1.34 [-1.76, -0.93] ✱ | 0.0000 |
+
+### Dictionary lookup coverage (FLORES dev, 17,159 content tokens)
+
+- lemma-keyed hit rate: **80.4%** (near-advisory extra 9.2%)
+- surface-keyed hit rate: **44.0%**
+- every surface hit is also a lemma hit (surface-only: 0.0%; lemma-only: +36.4 points)
+
+Lemma-only examples (surface lookup missed, lemma lookup hit):
+  - `كۈنى` → lemma `كۈن` → "kün (n.): 1. [astronomy] Sun / 2. Day / 3. Life; existence"
+  - `ئۇنىۋېرسىتېتى` → lemma `ئۇنىۋېرسىتېت` → "uniwërsitët (n.): University"
+  - `ئالىملىرى` → lemma `ئالىم` → "alim (n.): 1. Scholar; learned person / 2. Male name"
+
+### Follow-up interpretation — segmentation refuted; lemma-keyed dictionary confirmed
+
+**Study 1 (S): the segmentation hypothesis is refuted — separation alone hurts.**
+
+| Model | S − C0 | reading |
+|---|---|---|
+| Ministral-3-8B | **−3.41 ✱** | degenerates *more* under the bare list |
+| Llama-3.2-3B | **−6.02 ✱** | 697/997 preamble echoes |
+| Qwen3.5-9B | **−9.46 ✱** | no degeneration — *format mirroring* (see below) |
+| Llama-3.2-1B | **−0.74 ✱** | floor model, everything fails |
+| Gemma-4-E2B | +0.19 (n.s.) | already degenerate at C0; S changes the flavor, not the level |
+
+Two distinct failure mechanisms, both informative:
+
+1. **Weak models ramble harder.** The bare numbered list *without* the
+   analysis context invites list-shaped wandering: Ministral S hits 531/997
+   length-caps and 458 avg output tokens (vs 47/319 at C0, 2/60 at C1); Gemma
+   S emits a preamble in 991/997 cases; Llama-3B echoes headers in 697/997.
+   The anchor identified in the control/factorial is therefore **not** clean
+   word separation — it is the *structured linguistic-analysis framing*
+   (table frame + section headers + guidance) that makes the model treat the
+   input as an object to translate rather than to talk about. Segmentation
+   without that context is noise.
+2. **The strong model mirrors the format.** Qwen-9B does not degenerate under
+   S — it dutifully produces numbered-list *translations* ("1. On Monday,
+   2. scientists at Stanford… 3. announced…"), fragmenting the sentence and
+   losing 9.5 chrF++. Input presentation leaks into output structure even for
+   an instruction-faithful model.
+
+Capacity-floor refinement (Llama-3.2-1B): the lean C1 prompt also fails
+(C1−C0 = −0.55, n.s.) and *adds* degeneration (163 vs 14 length-caps at C0);
+C7−C1 = −1.34 ✱. So the floor is not about prompt size or complexity — the 1B
+cannot exploit the table format at all. Below ≈2B, nothing of this prompt
+family helps.
+
+**Study 2 (C3L): lemma-keyed glosses are the best component — in every regime.**
+
+| Model | C3L − C3 (lemma-keyed dict) | C3L − C1 (vs roles) | C3L chrF++ |
+|---|---|---|---|
+| Ministral-3-8B | **+1.86 ✱** [+1.13, +2.57] | **+1.39 ✱** [+0.68, +2.06] | **29.60** (best ever; prev. best C1 28.22) |
+| Gemma-4-E2B | **+0.95 ✱** [+0.60, +1.29] | **+2.52 ✱** [+2.13, +2.91] | **36.79** (best ever; prev. best C6 35.94) |
+| Qwen3.5-9B | −0.02 (n.s.) | +0.26 (n.s.) | 48.32 ≈ C3 48.34 (its best) |
+
+This *revises* the control-run conclusion that glosses are inert for the
+low-literacy model: they were **sparse, not inert** — surface-keyed lookups
+populate the dictionary column for only 44.0% of tokens (every surface hit is
+also a lemma hit; lemmatization adds +36.4 coverage points, e.g. `كۈنى` →
+lemma `كۈن` → "Sun / Day / Life"), and in combinations the other columns
+interfered. Delivered keyed-by-lemma in a lean table, the dictionary becomes
+the strongest single component for both weak models — and remains tied-best
+for the knowledge-rich model.
+
+**Convergent design optimum across all regimes measured:** the best lean prompt
+is the same everywhere — a token table whose dictionary column is fed by the
+morphology's lemmas (C3L), i.e. exactly the pipeline's dictionary-morphology
+integration. Syntax roles are second-order (neutral when added); the
+morphological-features column is actively harmful in combinations; the full
+C7 never pays for its extra sections.
+
+Methodological notes: (i) C3L−C3 conflates lemma-keying with the improved
+multi-sense gloss rendering (both changed between the runs); it measures the
+combined "morphology-fed dictionary" effect — precisely the pipeline design
+question. (ii) The planned old-vs-new gloss-format contrast degenerated to
+Δ=0.00: the surface-gloss disk cache served byte-identical prompts to both
+runs (two independent greedy runs, identical outputs — an unplanned but
+welcome determinism check).
