@@ -33,10 +33,20 @@ CHAT_KWARGS_BY_MODEL = {
     "Qwen/Qwen3.5-9B": {"enable_thinking": False},
 }
 
+# Thinking-output markers: text before the marker is reasoning, after is
+# content (tool calls / final answer)
+THINK_MARKER_BY_MODEL = {
+    "Qwen/Qwen3.5-9B": "**END**",
+    "google/gemma-4-E4B-it": "<channel|>",
+}
+
 # Llama-3.1's chat template only supports a single tool call per assistant
 # message (raises VLLMValidationError otherwise). For such models we execute
 # only the first call of a turn and log the rest as skipped.
 SINGLE_CALL_PER_TURN = {"meta-llama/Llama-3.1-8B-Instruct"}
+
+# Qwen's official thinking-mode sampling (also used for Gemma's thinking arm)
+RECOMMENDED_SAMPLING = {"temperature": 0.6, "top_p": 0.95, "top_k": 20}
 
 INSTRUCTION = (
     "You are an expert Uyghur-to-English translator.\n"
@@ -46,6 +56,34 @@ INSTRUCTION = (
     "need, and then give your final English translation as plain text.\n\n"
     "### Uyghur Source Sentence:\n{sentence}\n\n"
     "### English Translation:"
+)
+
+# Draft-first protocol (E4-DF): system message + protocol. The model first
+# translates on its own (draft), then retrieves for its uncertainties, then
+# gives a final translation. Separates the value of retrieval from framing
+# effects: Δ(final − draft) per episode is retrieval value given a draft.
+DF_SYSTEM = (
+    "You are an expert Uyghur-to-English translator. Work in this order:\n"
+    "1. In your first reply, translate the Uyghur sentence as well as you "
+    "can on your own. Output only the draft translation, nothing else.\n"
+    "2. Identify the specific words or constructions you were uncertain "
+    "about, and call the available tools to check exactly those. Do not "
+    "look up words you were already sure of.\n"
+    "3. When you are done checking, reply with the improved English "
+    "translation only, with no preamble, explanations, or word lists."
+)
+
+DF_USER = (
+    "Translate the following Uyghur sentence into English following the "
+    "working order you were given.\n\n"
+    "### Uyghur Source Sentence:\n{sentence}\n\n"
+    "### English Translation:"
+)
+
+DF_DRAFT_NUDGE = (
+    "That was your draft translation. Now check the words you were "
+    "uncertain about by calling the tools. If you were already fully "
+    "certain about every word, reply with your final translation now."
 )
 
 FORCED_FINAL = ("Tool budget exhausted. Do not call any more tools. "
@@ -63,14 +101,19 @@ class Episode:
     n_parse_failures: int = 0
     n_invalid_calls: int = 0
     n_unresolved: int = 0
+    n_length_caps: int = 0
+    think_chars: int = 0
     n_skipped_calls: int = 0
     forced_final: bool = False
+    draft: Optional[str] = None      # draft-first protocol: first own attempt
+    budget_limit: int = 0          # per-episode call budget (fixed or proportional)
+    n_content_tokens: int = 0      # sentence-length basis for proportional budgets
     tool_mix: Dict[str, int] = field(default_factory=dict)
     addressing: Dict[str, int] = field(default_factory=dict)
     call_log: List[dict] = field(default_factory=list)
     tokens_in: int = 0
     tokens_out: int = 0
-    finish: str = "in_progress"  # final | budget_forced | round_cap | failed
+    finish: str = "in_progress"  # final | budget_forced | round_cap | failed | context_overflow
     translation: Optional[str] = None
 
 
@@ -78,6 +121,12 @@ class AgentRunner:
     def __init__(self, llm, server, tools, model_id: str,
                  max_calls: int = 12, max_rounds: int = 6,
                  max_tokens: int = 512, context_limit: int = 16384,
+                 thinking: bool = False,
+                 sampling: Optional[Dict] = None,
+                 budget_policy: str = "fixed",
+                 budget_alpha: float = 1.0,
+                 budget_floor: int = 4,
+                 draft_first: bool = False,
                  allow_unbudgeted_final: bool = True):
         self.llm = llm
         self.server = server
@@ -87,6 +136,13 @@ class AgentRunner:
         self.max_rounds = max_rounds
         self.max_tokens = max_tokens
         self.context_limit = context_limit
+        self.thinking = thinking
+        self.sampling = sampling or {"temperature": 0.0}
+        self.think_marker = THINK_MARKER_BY_MODEL.get(model_id)
+        self.budget_policy = budget_policy
+        self.budget_alpha = budget_alpha
+        self.budget_floor = budget_floor
+        self.draft_first = draft_first
         self.allow_unbudgeted_final = allow_unbudgeted_final
 
         # per-family parser
@@ -96,7 +152,9 @@ class AgentRunner:
         self.parser = parser_cls(tokenizer)
         self._request = self._make_request()
 
-        self.chat_kwargs = CHAT_KWARGS_BY_MODEL.get(model_id, {})
+        self.chat_kwargs = dict(CHAT_KWARGS_BY_MODEL.get(model_id, {}))
+        if self.thinking:
+            self.chat_kwargs["enable_thinking"] = True
         self.single_call = model_id in SINGLE_CALL_PER_TURN
         self.tool_names = {t["function"]["name"] for t in tools}
 
@@ -112,15 +170,30 @@ class AgentRunner:
         )
 
     # ------------------------------------------------------------------
-    def new_episode(self, sent_idx, sentence, reference) -> Episode:
+    def new_episode(self, sent_idx, sentence, reference,
+                    n_content_tokens: int = 0) -> Episode:
         ep = Episode(sent_idx=sent_idx, sentence=sentence, reference=reference)
-        ep.messages = [{"role": "user", "content":
-                       INSTRUCTION.format(sentence=sentence)}]
+        if self.draft_first:
+            ep.messages = [
+                {"role": "system", "content": DF_SYSTEM},
+                {"role": "user", "content": DF_USER.format(sentence=sentence)},
+            ]
+        else:
+            ep.messages = [{"role": "user", "content":
+                           INSTRUCTION.format(sentence=sentence)}]
+        ep.n_content_tokens = n_content_tokens
+        if self.budget_policy == "proportional":
+            # one call per content word (alpha) — enough to gloss every word
+            # once; over-fetchers still hit it and are measured
+            ep.budget_limit = max(self.budget_floor,
+                                  round(self.budget_alpha * n_content_tokens))
+        else:
+            ep.budget_limit = self.max_calls
         return ep
 
     def _generate(self, episodes: List[Episode]) -> List[str]:
         from vllm import SamplingParams
-        sampling = SamplingParams(temperature=0.0, max_tokens=self.max_tokens)
+        sampling = SamplingParams(max_tokens=self.max_tokens, **self.sampling)
         convs = [ep.messages for ep in episodes]
         outs = self.llm.chat(
             convs, sampling, tools=self.tools,
@@ -131,7 +204,24 @@ class AgentRunner:
         for ep, out in zip(episodes, outs):
             ep.tokens_in += len(out.prompt_token_ids) if out.prompt_token_ids else 0
             ep.tokens_out += len(out.outputs[0].token_ids)
-            texts.append(out.outputs[0].text)
+            raw = out.outputs[0].text
+            # thinking mode: Qwen3.5 emits reasoning that flows into the tool
+            # call with no marker (verified live); the only reliable split is
+            # the reasoning-end marker on final turns. For tool-call turns we
+            # keep the raw stream (the parser skips reasoning text); for
+            # marker-less final turns the whole text is the reasoning + answer
+            # (rare) and is treated as content after stripping the reasoning.
+            if self.think_marker and self.think_marker in raw:
+                reasoning, content = raw.split(self.think_marker, 1)
+                ep.think_chars += len(reasoning)
+                texts.append(content)
+            else:
+                if out.outputs[0].finish_reason == "length":
+                    # generation ran out of tokens before finishing
+                    ep.n_length_caps += 1
+                    texts.append("")
+                else:
+                    texts.append(raw)
         return texts
 
     def _parse_calls(self, text: str) -> Optional[List[dict]]:
@@ -159,11 +249,15 @@ class AgentRunner:
     def _append_assistant(self, ep: Episode, text: str, calls: List[dict]):
         msg = {"role": "assistant", "content": text or ""}
         if calls:
+            # Qwen3.5's chat template requires arguments as a dict for
+            # tool_calls in the message history (string arguments fail
+            # template rendering with thinking enabled)
             msg["tool_calls"] = [
                 {"id": c["id"], "type": "function",
                  "function": {"name": c["name"],
-                              "arguments": json.dumps(c["arguments"],
-                                                      ensure_ascii=False)}}
+                              "arguments": dict(c["arguments"] or {})
+                              if isinstance(c["arguments"], dict)
+                              else str(c["arguments"] or "{}")}}
                 for c in calls]
         ep.messages.append(msg)
 
@@ -202,6 +296,13 @@ class AgentRunner:
             ep.n_calls += 1
         return bool(skipped)
 
+    def _final_answer_text(self, raw: str) -> str:
+        """Extract the final-answer text: in thinking mode, reasoning may
+        precede the answer; use the reasoning-end marker if present."""
+        if self.think_marker and self.think_marker in raw:
+            return raw.split(self.think_marker, 1)[1].strip()
+        return raw.strip()
+
     def _looks_like_tool_call(self, text: str) -> bool:
         """Heuristic: text claims to be a tool call but the parser found none
         (typically malformed JSON, e.g. Llama's \\uXXXX escapes)."""
@@ -239,7 +340,24 @@ class AgentRunner:
 
             for ep, text in zip(batch, texts):
                 ep.n_rounds += 1
+                # In thinking mode, a final-answer turn (no tool calls) puts
+                # reasoning before the marker and the answer after; a
+                # tool-call turn has no marker (reasoning flows into the
+                # call). Split lazily per case below.
+                raw = text
                 clean = _strip_think(text)
+
+                if not clean:
+                    # no content produced (thinking consumed the token budget,
+                    # or an empty generation) — corrective turn; protocol
+                    # data, not an answer
+                    ep.messages.append({"role": "user", "content":
+                                         "Your last message contained no "
+                                         "usable output. Be concise: either "
+                                         "call one tool or provide the final "
+                                         "English translation."})
+                    still_active.append(ep)
+                    continue
 
                 try:
                     calls = self._parse_calls(text)
@@ -289,9 +407,9 @@ class AgentRunner:
                     # attempt (e.g. malformed JSON with \\uXXXX escapes):
                     # route to the corrective handler instead of accepting
                     # garbage as a translation
-                    if self._looks_like_tool_call(clean):
+                    if self._looks_like_tool_call(raw):
                         ep.n_parse_failures += 1
-                        self._append_assistant(ep, clean, [])
+                        self._append_assistant(ep, self._final_answer_text(raw), [])
                         ep.messages.append({"role": "user", "content":
                                              "Your tool call could not be "
                                              "parsed. When providing a word "
@@ -304,22 +422,40 @@ class AgentRunner:
                                              "translation."})
                         still_active.append(ep)
                         continue
-                    ep.translation = clean.strip()
+
+                    final_text = self._final_answer_text(raw)
+                    if (self.draft_first and ep.draft is None
+                            and not ep.forced_final and ep.n_calls == 0):
+                        # draft-first protocol: the first no-call turn with
+                        # no executed calls yet IS the draft — store it, nudge
+                        # the model to check its uncertainties (or stop).
+                        ep.draft = final_text
+                        self._append_assistant(ep, final_text, [])
+                        ep.messages.append({"role": "user", "content":
+                                            DF_DRAFT_NUDGE})
+                        still_active.append(ep)
+                        continue
+                    ep.translation = final_text
                     ep.finish = ("budget_forced"
-                                 if ep.n_calls >= self.max_calls else "final")
+                                 if ep.n_calls >= ep.budget_limit else "final")
                     done[ep.sent_idx] = ep
                     continue
 
                 if ep.forced_final:
                     # model ignored the "no more tools" instruction: the
                     # refusal to stop is protocol data; terminate the episode
-                    ep.translation = clean.strip()
+                    ep.translation = self._final_answer_text(raw)
                     ep.finish = "budget_forced"
                     done[ep.sent_idx] = ep
                     continue
 
                 # has calls: execute within budget
-                budget_left = self.max_calls - ep.n_calls
+                budget_left = ep.budget_limit - ep.n_calls
+                if (self.draft_first and ep.draft is None and clean.strip()
+                        and budget_left > 0):
+                    # model drafted and called tools in the same turn: the
+                    # content part is the draft
+                    ep.draft = clean.strip()
                 if budget_left > 0:
                     skipped = self._execute_calls(ep, calls, budget_left)
                 else:
@@ -328,7 +464,7 @@ class AgentRunner:
                     # calls would leave the conversation assistant-
                     # terminated, which some chat templates reject)
 
-                if (skipped or ep.n_calls >= self.max_calls) and not ep.forced_final:
+                if (skipped or ep.n_calls >= ep.budget_limit) and not ep.forced_final:
                     ep.forced_final = True
                     ep.messages.append({"role": "user", "content": FORCED_FINAL})
 
@@ -338,7 +474,7 @@ class AgentRunner:
 
                 if ep.n_rounds >= self.max_rounds + 2:
                     # hard stop: keep whatever text we have
-                    ep.translation = clean.strip()
+                    ep.translation = self._final_answer_text(raw)
                     ep.finish = ("round_cap" if ep.n_calls else "failed")
                     done[ep.sent_idx] = ep
                     continue
@@ -356,14 +492,19 @@ def episode_record(ep: Episode, model_id: str, condition: str) -> dict:
         "condition": condition,
         "sentence": ep.sentence,
         "reference": ep.reference,
+        "draft": ep.draft,
         "translation": ep.translation,
         "finish": ep.finish,
         "n_rounds": ep.n_rounds,
         "n_calls": ep.n_calls,
+        "budget_limit": ep.budget_limit,
+        "n_content_tokens": ep.n_content_tokens,
         "n_skipped_calls": ep.n_skipped_calls,
         "forced_final": ep.forced_final,
         "n_parse_failures": ep.n_parse_failures,
         "n_invalid_calls": ep.n_invalid_calls,
+        "n_length_caps": ep.n_length_caps,
+        "think_chars": ep.think_chars,
         "n_unresolved": ep.n_unresolved,
         "tool_mix": ep.tool_mix,
         "addressing": ep.addressing,

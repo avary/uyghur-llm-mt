@@ -33,7 +33,7 @@ from experiments.exp4_agentic_retrieval.tool_server import (  # noqa: E402
     TOOLS_SCHEMA, LEAN_TOOLS, load_server,
 )
 from experiments.exp4_agentic_retrieval.agent_loop import (  # noqa: E402
-    AgentRunner, episode_record,
+    AgentRunner, RECOMMENDED_SAMPLING, episode_record,
 )
 
 DEFAULT_MODELS = [
@@ -46,9 +46,28 @@ DEFAULT_MODELS = [
 DEV_REF = os.path.join(_REPO_ROOT, "flores200_dataset", "eng_Latn.dev")
 RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 
+# condition spec: tools + reasoning regime + sampling + per-turn token budget.
+# E4-AT isolates the thinking effect on tool selection; E4-AS (thinking OFF,
+# same recommended sampling) isolates the sampling change so E4-AT vs E4-A is
+# deconfounded. Thinking turns get 16k tokens (Qwen3.5 reasons at length even
+# for single tool-call decisions - budget exhaustion mid-reasoning is a
+# protocol artifact we do not want to manufacture).
 CONDITIONS = {
-    "E4-A": {"tools": TOOLS_SCHEMA},
-    "E4-B": {"tools": LEAN_TOOLS},
+    "E4-A": {"tools": TOOLS_SCHEMA, "thinking": False, "sampling": None,
+              "max_tokens": None, "draft_first": False},
+    "E4-B": {"tools": LEAN_TOOLS, "thinking": False, "sampling": None,
+              "max_tokens": None, "draft_first": False},
+    "E4-AT": {"tools": TOOLS_SCHEMA, "thinking": True,
+               "sampling": RECOMMENDED_SAMPLING, "max_tokens": 16384,
+               "draft_first": False},
+    "E4-AS": {"tools": TOOLS_SCHEMA, "thinking": False,
+               "sampling": RECOMMENDED_SAMPLING, "max_tokens": 16384,
+               "draft_first": False},
+    # Draft-first protocol: system-prompt instruction to (1) draft on its
+    # own, (2) retrieve ONLY for uncertainties, (3) final translation.
+    # Greedy, thinking off, same caps as E4-A for a clean protocol contrast.
+    "E4-DF": {"tools": TOOLS_SCHEMA, "thinking": False, "sampling": None,
+               "max_tokens": None, "draft_first": True},
 }
 
 # guardrails calibrated in Phase 0 (see DESIGN.md / ANALYSIS.md): log-only
@@ -69,13 +88,20 @@ def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["phase0", "translate"], required=True)
     ap.add_argument("--models", nargs="+", default=DEFAULT_MODELS)
-    ap.add_argument("--conditions", nargs="+", default=list(CONDITIONS),
+    ap.add_argument("--conditions", nargs="+", default=["E4-A", "E4-B"],
                     choices=list(CONDITIONS))
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--max-calls", type=int, default=DEFAULTS["max_calls"])
     ap.add_argument("--max-rounds", type=int, default=DEFAULTS["max_rounds"])
     ap.add_argument("--max-tokens", type=int, default=DEFAULTS["max_tokens"])
     ap.add_argument("--p0-episodes", type=int, default=P0["episodes"])
+    ap.add_argument("--budget-policy", choices=["fixed", "proportional"],
+                    default="fixed",
+                    help="fixed: same call budget for every sentence; "
+                         "proportional: budget = alpha x content tokens "
+                         "(one gloss per word; floor)")
+    ap.add_argument("--budget-alpha", type=float, default=1.0)
+    ap.add_argument("--budget-floor", type=int, default=4)
     ap.add_argument("--gpu-mem-util", type=float, default=0.90)
     ap.add_argument("--max-model-len", type=int, default=32768)
     return ap.parse_args()
@@ -99,7 +125,16 @@ def run_model_condition(args, model_id, condition, records, refs, server,
 
     runner = AgentRunner(
         llm=_LLM, server=server, tools=CONDITIONS[condition]["tools"],
-        model_id=model_id, **caps)
+        model_id=model_id,
+        max_tokens=CONDITIONS[condition]["max_tokens"] or caps["max_tokens"],
+        context_limit=caps.get("context_limit", 16384),
+        thinking=CONDITIONS[condition]["thinking"],
+        sampling=CONDITIONS[condition]["sampling"],
+        budget_policy=caps.get("budget_policy", "fixed"),
+        budget_alpha=caps.get("budget_alpha", 1.0),
+        budget_floor=caps.get("budget_floor", 4),
+        draft_first=CONDITIONS[condition]["draft_first"],
+        max_calls=caps["max_calls"], max_rounds=caps["max_rounds"])
 
     writer = ckpt.JSONLCheckpointWriter(path)
     CHUNK = 128
@@ -107,7 +142,10 @@ def run_model_condition(args, model_id, condition, records, refs, server,
     try:
         for start in range(0, len(todo_idx), CHUNK):
             batch_idx = todo_idx[start:start + CHUNK]
-            eps = [runner.new_episode(i, records[i]["sentence"], refs[i])
+            eps = [runner.new_episode(i, records[i]["sentence"], refs[i],
+                                       n_content_tokens=sum(
+                                           1 for t in records[i]["per_token"]
+                                           if t["pos"] != "Punctuation"))
                    for i in batch_idx]
             done = runner.run(eps)
             for ep in done:
@@ -167,7 +205,10 @@ def main():
 
     if args.mode == "phase0":
         caps = {"max_calls": P0["max_calls"], "max_rounds": P0["max_rounds"],
-                "max_tokens": P0["max_tokens"], "context_limit": args.max_model_len}
+                "max_tokens": P0["max_tokens"], "context_limit": args.max_model_len,
+                "budget_policy": args.budget_policy,
+                "budget_alpha": args.budget_alpha,
+                "budget_floor": args.budget_floor}
         n0 = min(args.p0_episodes, len(records))
         recs0, refs0 = records[:n0], refs[:n0]
         for model_id in args.models:
@@ -184,7 +225,10 @@ def main():
 
     # translate mode
     caps = {"max_calls": args.max_calls, "max_rounds": args.max_rounds,
-            "max_tokens": args.max_tokens, "context_limit": args.max_model_len}
+            "max_tokens": args.max_tokens, "context_limit": args.max_model_len,
+            "budget_policy": args.budget_policy,
+            "budget_alpha": args.budget_alpha,
+            "budget_floor": args.budget_floor}
     for model_id in args.models:
         print(f"\n[exp4] ===== {model_id} =====", flush=True)
         _LLM = vllm_runner.make_llm(model_id, max_model_len=args.max_model_len,

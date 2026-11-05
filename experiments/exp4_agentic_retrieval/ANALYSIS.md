@@ -246,3 +246,286 @@ was gloss-dominant; its miss-path behavior — explore-lemma 73%, accept 14%,
 explore-near 10% — is precisely the sensible policy), which sharpens the
 conclusion: the negative result is a property of the pull paradigm, not of
 the implementation.
+
+## Thinking-mode follow-up — design notes & verified format behavior
+
+Both Qwen3.5 and Gemma-4 templates accept `enable_thinking` (rendered live:
+Qwen opens the `uns` block; Gemma inserts a `<|think|>` system marker and
+splits output with `<|channel>thought ... <channel|>`).
+
+**Verified empirically (live single-turn + multi-turn round-trip tests):**
+
+- **Qwen3.5-9B with thinking ON + tools emits NO `**END**` marker**: the
+  reasoning prose flows directly into the qwen3-coder tool call (verified
+  over three separate generations; multi-turn history with `tool_calls`
+  re-renders correctly). Consequence: per-turn reasoning cannot be cleanly
+  separated from content — reasoning text bleeds into echoed assistant
+  messages and finals (smoke test: all 8 episodes' finals contained
+  reasoning-bleed, 285-560 words). This is *measured model behavior*
+  (register destruction in thinking mode, consistent with Exp 2b), not an
+  implementation artifact. The loop treats marker-less thinking output as
+  content and lets the corrective/final paths handle it.
+- Qwen3.5's chat template requires `tool_calls` arguments as **dicts** in
+  history (string arguments raise `Can only get item pairs from a mapping`
+  with thinking on); the loop now echoes dict arguments.
+- Gemma-4 splits cleanly (`<|channel>thought ... <channel|>`), so its
+  reasoning is separable and `think_chars` will be meaningful.
+
+**Budget policy (both thinking arms):** proportional — `budget = alpha x
+content tokens` (alpha=1, floor 4; i.e. enough to gloss every word once),
+identical in E4-AT and E4-AS so the thinking contrast stays clean. The
+flat-24 budget previously penalized long sentences (35-token sentences hit
+the cap with legitimate full-table fetching) and subsidized short ones.
+
+**Token budgets loosened:** 16384 per assistant turn in thinking arms
+(reasoning runs long even for single tool-call decisions; mid-reasoning
+exhaustion would be our artifact, not model behavior), max_model_len 65536.
+Context-overflow guardrail (from the Llama incident) remains as backstop.
+
+**Sampling deconfounding:** thinking requires recommended sampling
+(t=0.6, top_p=0.95, top_k=20). E4-AS (thinking OFF, same sampling) isolates
+the sampling change; the clean thinking contrast is E4-AT − E4-AS.
+
+## Exp 4 follow-up — thinking mode in the agentic loop
+
+Sampling note: thinking mode requires recommended sampling (t=0.6, top_p=0.95, top_k=20); E4-AS (thinking OFF, same sampling) deconfounds the sampling change.
+
+### Quality
+
+| Model | Cond | chrF++ | COMET |
+|---|---|---|---|
+| Qwen3.5-9B | C0 | 47.63 | 0.8544 |
+| Qwen3.5-9B | C3L | 48.32 | 0.8575 |
+| Qwen3.5-9B | E4-A | 43.56 | 0.8216 |
+| Qwen3.5-9B | E4-AS | 42.86 | 0.8270 |
+| Qwen3.5-9B | E4-AT | 15.84 | 0.5004 |
+| Gemma-4-E4B | C0 | 25.71 | 0.6341 |
+| Gemma-4-E4B | C3L | 42.86 | 0.8078 |
+| Gemma-4-E4B | E4-A | 38.12 | 0.7731 |
+| Gemma-4-E4B | E4-AS | 39.77 | 0.7799 |
+| Gemma-4-E4B | E4-AT | 41.34 | 0.7926 |
+
+### Contrasts (paired bootstrap, chrF++)
+
+| Model | Contrast | Δ [95% CI] | p |
+|---|---|---|---|
+| Qwen3.5-9B | E4-AS − E4-A (sampling effect) | -0.69 [-2.38, +0.94] | 0.4400 |
+| Qwen3.5-9B | E4-AT − E4-AS (thinking effect, clean) | -27.03 [-28.77, -25.29] ✱ | 0.0000 |
+| Qwen3.5-9B | E4-AT − E4-A (thinking+sampling combined) | -27.72 [-28.98, -26.46] ✱ | 0.0000 |
+| Qwen3.5-9B | E4-AT − C3L (thinking pull vs best push) | -32.48 [-33.22, -31.69] ✱ | 0.0000 |
+| Gemma-4-E4B | E4-AS − E4-A (sampling effect) | +1.65 [+0.86, +2.47] ✱ | 0.0004 |
+| Gemma-4-E4B | E4-AT − E4-AS (thinking effect, clean) | +1.57 [+1.05, +2.13] ✱ | 0.0000 |
+| Gemma-4-E4B | E4-AT − E4-A (thinking+sampling combined) | +3.22 [+2.39, +4.09] ✱ | 0.0000 |
+| Gemma-4-E4B | E4-AT − C3L (thinking pull vs best push) | -1.52 [-1.96, -1.06] ✱ | 0.0000 |
+
+### Behavior
+
+| Model | Cond | ep w/ calls | calls/ep | rounds/ep | budget-forced | think chars/ep | length-caps |
+|---|---|---|---|---|---|---|---|
+| Qwen3.5-9B | E4-A | 408/997 | 7.8 | 2.7 | 145 | 0 | 0 |
+| Qwen3.5-9B | E4-AS | 497/997 | 7.8 | 2.5 | 394 | 0 | 3 |
+| Qwen3.5-9B | E4-AT | 997/997 | 14.2 | 4.3 | 475 | 0 | 3 |
+| Gemma-4-E4B | E4-A | 184/997 | 1.5 | 2.5 | 0 | 0 | 0 |
+| Gemma-4-E4B | E4-AS | 208/997 | 1.8 | 2.5 | 57 | 135 | 0 |
+| Gemma-4-E4B | E4-AT | 967/997 | 7.8 | 5.6 | 204 | 8263 | 0 |
+
+Tool mix:
+  - Qwen3.5-9B E4-AS: {'get_word_list': 478, 'get_gloss': 6343, 'get_lemma': 660, 'get_near_matches': 129, 'get_features': 87, 'get_syntax': 46}
+  - Qwen3.5-9B E4-AT: {'get_word_list': 996, 'get_gloss': 10987, 'get_lemma': 1536, 'get_near_matches': 221, 'get_syntax': 240, 'get_features': 150}
+  - Gemma-4-E4B E4-AS: {'get_word_list': 206, 'get_gloss': 1596, 'get_near_matches': 7, 'get_lemma': 9, 'get_syntax': 2}
+  - Gemma-4-E4B E4-AT: {'get_word_list': 944, 'get_syntax': 576, 'get_gloss': 5820, 'get_near_matches': 121, 'get_features': 36, 'get_lemma': 304}
+
+### Calibration (H4)
+
+| Model | Cond | gloss fetches | recall | precision |
+|---|---|---|---|---|
+| Qwen3.5-9B | E4-A | 5445 | 0.32 | 0.206 |
+| Qwen3.5-9B | E4-AS | 6275 | 0.371 | 0.207 |
+| Qwen3.5-9B | E4-AT | 10851 | 0.635 | 0.205 |
+| Gemma-4-E4B | E4-A | 1264 | 0.077 | 0.189 |
+| Gemma-4-E4B | E4-AS | 1596 | 0.089 | 0.172 |
+| Gemma-4-E4B | E4-AT | 5778 | 0.366 | 0.195 |
+
+### Thinking-mode follow-up — interpretation
+
+**Headline: thinking splits the two families in opposite directions.**
+
+| Contrast (paired bootstrap) | Qwen3.5-9B | Gemma-4-E4B |
+|---|---|---|
+| E4-AS − E4-A (sampling) | −0.69 n.s. | +1.65 ✱ |
+| **E4-AT − E4-AS (thinking, clean)** | **−27.03 ✱** | **+1.57 ✱** |
+| E4-AT − C3L (vs best push) | −32.48 ✱ | −1.52 ✱ |
+
+**Qwen3.5-9B: catastrophic (43.6 → 15.8 chrF++).** The collapse is *not* a
+protocol failure — it is register destruction at extreme scale: finals average
+**305 words** (p95: 593) of reasoning-bleed ("Based on the lemmas and
+context, I can now translate the sentence: - دۈشەنبە كۈنى = Monday …"), a
+word-by-word gloss worksheet instead of a translation. With thinking enabled
+(and no reasoning-end marker in tool mode — verified during design), Qwen
+cannot stop *showing its work*: 997/997 episodes fetch (vs 497 in the control
+arm), 14.2 calls/episode, 475 budget-forced. Consistent with Exp 2b (thinking
+harmed its translation under greedy AND recommended sampling), now amplified
+by the retrieval dialog: each round of reasoning gives the register
+destruction more surface to latch onto.
+
+**Gemma-4-E4B: the first-ever positive thinking result in this thesis
+(+1.57 ✱, E4-A 38.1 → E4-AT 41.3, closing to within 1.5 of its C3L push).**
+The behavior profile explains it: thinking makes Gemma *actually use* the
+tools (967/997 episodes fetch, 7.8 calls/ep vs 1.5 thinking-off — recall
+0.077 → 0.366), with clean 9k-char reasoning blocks and **compact finals** (no
+register bleed). Gemma's thinking solves the same problem the static table
+solved for it: it turns passive competence into active information use. But
+the ceiling shows: still below its static C3L push (42.9) — even perfect
+agency under-performs handing the model the right information.
+
+**H4 update — reasoning improves recall, never precision.** Qwen recall
+0.32 → 0.64, Gemma 0.08 → 0.37 under thinking; precision stays ~0.2 in all
+six cells. Thinking makes models fetch *more*, not *better*: it activates
+retrieval (Qwen's 997/997, Gemma's 967/997) without improving which words are
+chosen. The metacognitive gap is not closed by reasoning tokens.
+
+**Sampling deconfound (E4-AS):** near-zero for Qwen (−0.69 n.s.), mildly
+positive for Gemma (+1.65 ✱ — stochasticity slightly helps its zero-shot-ish
+anchored mode). Neither explains the thinking effects.
+
+**Synthesis for the thesis:** the register-preservation law survives its
+final stress test. Thinking mode is the strongest register destroyer we have
+measured for Qwen (−27 in-loop, worse than its −6.4 static-greedy from Exp
+2b, amplified by the retrieval dialog), while for a model whose failure mode
+is *under*-engagement (Gemma's zero-call anchoring), reasoning tokens act as
+an activator — buying real gains (+1.6) but never surpassing the static
+optimum. The best information-delivery mechanism remains the lean static
+gloss table; thinking in the loop is at best a partial substitute for it,
+paid for in 8-16k-token reasoning traces, and at worst catastrophic.
+
+## Draft-first protocol (E4-DF) — design notes
+
+**Protocol** (system-prompt instruction, thinking OFF, greedy, E4-A-matched
+caps — so E4-DF − E4-A is the clean protocol contrast):
+
+> 1. In your first reply, translate the Uyghur sentence as well as you can on
+>    your own. Output only the draft translation.
+> 2. Identify the specific words or constructions you were uncertain about,
+>    and call the available tools to check exactly those. Do not look up words
+>    you were already sure of.
+> 3. When done, reply with the improved English translation only.
+
+Loop mechanics: the first no-tool-call turn is captured as the draft (with a
+standardized nudge to check uncertainties — identical across episodes); the
+next no-call turn is the final. Drafting + calling tools in one turn also
+captures the draft (content part).
+
+**Why this design**: it attacks the register-destruction mechanism diagnosed
+in E4-A (retrieval before translation → worksheet mode) by making translation
+the *primary* register and retrieval a verification step. It also unlocks two
+measurements impossible before:
+- **Δ(final − draft)** per episode: the value of retrieval given a draft,
+  cleanly separated from framing/anchor effects (draft shares the framing,
+  lacks the information);
+- **Calibration against the draft** (fetched words vs words the draft itself
+  got wrong) — a same-episode, same-framing needed-words signal, far better
+  grounded than the C0-based heuristic used for H4 so far.
+
+Smoke test (Qwen-9B, 8 episodes): 8/8 drafts produced, selective retrieval
+(101 calls total vs ~240 at E4-A rates), visible draft→final corrections
+("Pattaw" → "Pattawi" after 13 lookups). Full run: 4 models × 997.
+
+## Exp 4 follow-up — draft-first protocol (E4-DF)
+
+Instruction (system prompt): draft on your own → check ONLY uncertainties with tools → final translation. Thinking off, greedy, same caps as E4-A.
+
+### Quality
+
+| Model | Cond | chrF++ | COMET |
+|---|---|---|---|
+| Qwen3.5-9B | C0 | 47.63 | 0.8544 |
+| Qwen3.5-9B | C3L | 48.32 | 0.8575 |
+| Qwen3.5-9B | E4-A | 43.56 | 0.8216 |
+| Qwen3.5-9B | E4-DF | 47.71 | 0.8423 |
+| Gemma-4-E4B | C0 | 25.71 | 0.6341 |
+| Gemma-4-E4B | C3L | 42.86 | 0.8078 |
+| Gemma-4-E4B | E4-A | 38.12 | 0.7731 |
+| Gemma-4-E4B | E4-DF | 32.12 | 0.6621 |
+
+### Contrasts (paired bootstrap, chrF++)
+
+| Model | Contrast | Δ [95% CI] | p |
+|---|---|---|---|
+| Qwen3.5-9B | E4-DF − E4-A (draft-first protocol) | +4.16 [+3.09, +5.27] ✱ | 0.0000 |
+| Qwen3.5-9B | E4-DF − C0 | +0.09 [-0.44, +0.61] | 0.7484 |
+| Qwen3.5-9B | E4-DF − C3L (vs best push) | -0.60 [-1.08, -0.12] ✱ | 0.0144 |
+| Gemma-4-E4B | E4-DF − E4-A (draft-first protocol) | -6.00 [-6.98, -5.01] ✱ | 0.0000 |
+| Gemma-4-E4B | E4-DF − C0 | +6.40 [+5.59, +7.21] ✱ | 0.0000 |
+| Gemma-4-E4B | E4-DF − C3L (vs best push) | -10.74 [-11.50, -10.00] ✱ | 0.0000 |
+
+### Draft analysis (per-episode, sentence chrF)
+
+| Model | has draft | changed | draft chrF | final chrF | Δ(fin−dr) mean | P(better) | P(worse) |
+|---|---|---|---|---|---|---|---|
+| Qwen3.5-9B | 997/997 | 365 | 46.54 | 47.3 | 0.76 | 0.169 | 0.102 |
+| Gemma-4-E4B | 997/997 | 611 | 39.35 | 34.16 | -5.19 | 0.089 | 0.491 |
+
+### Calibration vs draft + behavior (E4-DF)
+
+- **Qwen3.5-9B**: gloss fetches 6109, recall 0.35, precision 0.183; calls/ep 9.5, budget-forced 34, episodes w/ calls 976/997, parse-fail 0, tool mix {'get_gloss': 6651, 'get_near_matches': 778, 'get_lemma': 1276, 'get_word_list': 536, 'get_features': 215, 'get_syntax': 44}
+- **Gemma-4-E4B**: gloss fetches 10494, recall 0.588, precision 0.194; calls/ep 11.0, budget-forced 13, episodes w/ calls 997/997, parse-fail 0, tool mix {'get_word_list': 296, 'get_gloss': 10529, 'get_lemma': 82, 'get_near_matches': 83, 'get_features': 13, 'get_syntax': 5}
+
+### Draft-first results — interpretation
+
+| Contrast | Qwen3.5-9B | Gemma-4-E4B |
+|---|---|---|
+| E4-DF − E4-A (protocol effect) | **+4.16 ✱** | **−6.00 ✱** |
+| E4-DF − C0 | +0.09 n.s. | +6.40 ✱ |
+| E4-DF − C3L (vs best push) | −0.60 ✱ | −10.74 ✱ |
+| Δ(final − draft), per-episode | **+0.76** (P(better)=0.17 vs P(worse)=0.10) | **−5.19** (P(worse)=0.49!) |
+| Draft chrF (same framing) | 46.54 | 39.35 |
+
+**Qwen: the draft-first protocol nearly repairs agentic retrieval.** E4-A's
+register destruction (43.56) is almost fully reversed (47.71, +4.16 ✱) —
+translation restored as the primary register (finals: 23 words avg, zero
+verification commentary). And the decomposition shows *where* the value lies:
+drafts alone score **46.54** — within 1 point of C0 (47.63) — while retrieval
+adds +0.76. The protocol's gain over E4-A is mostly the *framing* (the
+draft-instruction context anchors the output), not the fetched information;
+retrieval-on-a-draft is worth less than a static gloss table (+0.76 vs C3L's
++0.71-over-C0 — same ballpark, at ~10x the tokens). Qwen ends at −0.60 ✱
+below C3L: draft-first agency converges back to the static optimum without
+reaching it.
+
+**Gemma: the same protocol is actively destructive (−6.00 ✱).** Mechanism,
+quantified: 459/997 finals are **verification commentary** ("The initial
+translation seems accurate based on the dictionary lookups…") — 22→55 avg
+words, Δ(fin−dr) = −5.19 with P(worse) = 0.49. Restricted to the 538 episodes
+where Gemma *did* output a translation, Δ(fin−dr) = **−0.01** — retrieval
+neither helped nor hurt. So Gemma's damage is *pure register*: it answers the
+instruction as a discussion prompt instead of a translation prompt, and its
+drafts (39.35 — strong, near its E4-A zero-call anchor level) get abandoned
+in favor of commentary.
+
+**Why the protocol splits the families this way:** it demands *two* skills —
+(a) produce a first-pass translation, (b) treat retrieval as internal
+verification, invisible in the final output. Qwen has both; its only prior
+failure was that retrieval-before-drafting dragged it into worksheet mode,
+which the draft-first ordering removes. Gemma's compliance profile is the
+opposite: its instruction-following binds to the *verification* framing
+(weak models over-comply — echoing the E4-A zero-call anchoring result from
+the other side), and it cannot suppress the meta-discourse. The same
+instruction is a fix for one model and a trigger for the other: **prompt
+protocols interact with model capability in both directions.**
+
+**Calibration note (draft-based, better-grounded than the C0 heuristic):**
+recall improves when retrieval is draft-anchored (Qwen 0.35, Gemma 0.59 — its
+best ever) — but precision stays ~0.19 everywhere. A concrete artifact of
+its own attempt does not teach either model *which* words it got wrong;
+fetching remains poorly aimed even when anchored to a draft.
+
+**Thesis-level summary of the agentic chapter:** across three protocols —
+retrieve-then-translate (E4-A), thinking-enabled retrieval (E4-AT), and
+draft-then-verify (E4-DF) — pull-based retrieval never beats the static lean
+push (C3L) for any model, on any measure. The best agentic configuration
+(Qwen E4-DF, 47.71) exactly reproduces the information value of a static
+gloss table at 10x the token cost; every other configuration is worse. The
+register-preservation law explains all of it: any protocol step that
+interposes discourse between the model and the translation output (tool
+dialog, reasoning, verification discussion) taxes quality by more than the
+retrieved information pays.

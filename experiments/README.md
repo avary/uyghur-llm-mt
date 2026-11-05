@@ -224,30 +224,27 @@ Outputs: `results/exp3_special.{json,md}` + `ANALYSIS.md` section (scores,
 COMET, behavior stats, paired bootstrap contrasts, offline lookup coverage
 analysis with lemma-only examples).
 
-## Experiment 4 — Agentic Retrieval (`exp4_agentic_retrieval/`)
+## Experiment 4 follow-up — Thinking Mode (`run_exp4_think.sh` / `score_exp4_think.py`)
 
-**Question**: can the LLM decide for itself what information it needs (pull),
-compared to the fixed lean/best push prompts (C3L) and the maximal C7 —
-and does agency value follow the capability axis (H1 selectivity pays /
-H2 protocol burden / H3 loop-as-anchor / H4 metacognition calibration)?
+Does thinking improve *tool selection* (metacognition) even though it hurt
+direct translation (Exp 2b)? Qwen3.5-9B + Gemma-4-E4B, conditions:
 
-Protocol: per-sentence agent episodes over the pipeline's information as
-six minimal tools (word_list, lemma, gloss, near_matches, features, syntax);
-round-synchronous batching; greedy, thinking off; calibrated caps 24/8/512.
-Models: Qwen3.5-9B, Gemma-4-E4B, Ministral-3-8B, Llama-3.1-8B.
+- **E4-AT**: thinking ON, recommended sampling (t=0.6, top_p=0.95, top_k=20),
+  16k tokens/turn
+- **E4-AS**: thinking OFF, same sampling — deconfounds sampling so
+  E4-AT − E4-AS is the clean thinking contrast (and E4-AS − E4-A the
+  sampling effect)
 
-- `DESIGN.md` — full design (tool schemas, hypotheses, Phase 0)
-- `ANALYSIS.md` — Phase-0 verification record + full-run results
-- `tool_server.py` — schemas + execution against the persisted analysis
-- `agent_loop.py` — episode state machine + per-family tool-call parsing
-  (qwen3_coder / llama3_json / mistral / gemma4 via vLLM's registry)
-- `run_exp4.py` — driver (`--mode phase0|translate`)
-- `score_exp4.py` — quality + behavior + miss-path trichotomy + H4 calibration
-- `run_exp4.sh` — batch-safe wrapper (adds the two missing static C3L
-  baselines, runs E4-A/E4-B, scores)
+Proportional call budget (alpha x content tokens, floor 4) in both arms;
+identical policy keeps the contrast clean. Scoring adds think-length,
+length-caps, and the calibration table per arm. Format notes (verified
+live): Qwen thinking+tools emits no reasoning-end marker — reasoning bleeds
+into content and is *measured* (register effect); Gemma splits cleanly via
+`<|channel>thought ... <channel|>`; Qwen history requires dict tool-call
+arguments.
 
 ```bash
-bash experiments/exp4_agentic_retrieval/run_exp4.sh   # batch-safe
+bash experiments/exp4_agentic_retrieval/run_exp4_think.sh   # batch-safe
 ```
 
 ## Post-hoc diagnostics (`experiments/common/diagnose_results.py`)
@@ -265,3 +262,42 @@ vs dictionary-coverage buckets. Key output lives in this README's results tables
 3. Exp 2 translate → score
 4. Exp 2 Tier 2: greedy arm (9B, n=200) + recommended arm (9B/4B/27B full)
 5. All summaries + metrics JSONs are the thesis tables' source of truth
+
+## Experiment 4 — Agentic Retrieval (`exp4_agentic_retrieval/`)
+
+**Question**: can the LLM decide for itself what information it needs (pull),
+compared to the fixed lean/best push prompts (C3L) and the maximal C7 —
+and does agency value follow the capability axis (H1 selectivity pays /
+H2 protocol burden / H3 loop-as-anchor / H4 metacognition calibration)?
+
+Protocol: per-sentence agent episodes over the pipeline's information as
+six minimal tools (word_list, lemma, gloss, near_matches, features, syntax);
+round-synchronous batching; greedy, thinking off; caps 24/8/512 (E4-A/E4-B).
+Models: Qwen3.5-9B, Gemma-4-E4B, Ministral-3-8B, Llama-3.1-8B.
+
+- `DESIGN.md` — full design (tool schemas, hypotheses, Phase 0)
+- `ANALYSIS.md` — Phase-0 verification record + full-run results + incidents
+- `tool_server.py` — schemas + execution against the persisted analysis
+- `agent_loop.py` — episode state machine + per-family tool-call parsing
+  (qwen3_coder / llama3_json / mistral / gemma4 via vLLM's registry)
+- `run_exp4.py` — driver (`--mode phase0|translate`)
+- `score_exp4.py` — quality + behavior + miss-path trichotomy + H4 calibration
+- `run_exp4.sh` — batch-safe wrapper (adds the two missing static C3L
+  baselines, runs E4-A/E4-B, scores)
+
+```bash
+bash experiments/exp4_agentic_retrieval/run_exp4.sh   # batch-safe
+```
+
+### Exp 4 follow-up: draft-first protocol (`run_exp4_df.sh` / `score_exp4_df.py`)
+
+System-prompt instruction: (1) draft translation on its own, (2) call tools
+ONLY for uncertainties, (3) final translation. Thinking off, greedy, E4-A
+caps → E4-DF − E4-A is the clean protocol contrast. Adds per-episode
+Δ(final − draft) (retrieval value given a draft) and draft-based calibration.
+`score_exp4_df.py` writes `results/exp4_df_{metrics.json,summary.md}` +
+appends to `ANALYSIS.md`.
+
+```bash
+bash experiments/exp4_agentic_retrieval/run_exp4_df.sh   # batch-safe
+```
